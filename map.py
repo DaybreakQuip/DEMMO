@@ -3,11 +3,6 @@ import datetime
 import pickle
 
 
-#monster_location = {"x": [0,2,3], "y": [1,2,4]}  # create a dictionary
-#pickle.dump(monster_location, open("__HOME__/monster.p", "wb"))
-#npc_location = {"x": [1,4,0], "y": [1,3,2]}
-#pickle.dump(npc_location, open("__HOME__/npc.p", "wb"))
-
 class Monster:
     def __str__(self):
         return "M"
