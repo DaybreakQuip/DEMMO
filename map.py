@@ -1,7 +1,7 @@
 import sqlite3
 import datetime
 import pickle
-
+import json
 
 class Monster:
     def __str__(self):
@@ -14,9 +14,9 @@ class Player:
     def __str__(self):
         return "P"
 class Map:
-    def __init__(self):
-        self.width = 5
-        self.height = 5
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
         self.grid = {(x,y): ["&nbsp&nbsp"] for x in range(self.width) for y in range(self.height)}
 
     def __str__(self):
@@ -36,12 +36,20 @@ class Map:
 
 
 def request_handler(request=None):
-    mapper = Map()
-    monster = pickle.load(open( "__HOME__/monster.p", "rb" ))
-    npc = pickle.load(open( "__HOME__/npc.p", "rb" ))
-    for i in range(len(monster["x"])):
-        mapper.addToMap(monster["x"][i], monster["y"][i], Monster())
-    for i in range(len(npc["x"])):
-        mapper.addToMap(npc["x"][i], npc["y"][i], NPC())
-    mapper.addToMap(0,1, Player())
-    return mapper.__str__()
+    with open("__HOME__/demmo/map.JSON") as map_file:
+        map_data = json.load(map_file)
+        width = map_data['width']
+        height = map_data['height']
+        monsters = map_data['monsters']
+        shops = map_data['shops']
+
+        game_map = Map(width, height)
+        for x, y in monsters:
+            game_map.addToMap(x, y, Monster())
+        for x, y in shops:
+            game_map.addToMap(x, y, NPC())
+        game_map.addToMap(0, 1, Player())
+
+        return str(game_map)
+
+
