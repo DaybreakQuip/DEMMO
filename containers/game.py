@@ -3,6 +3,8 @@ sys.path.append('__HOME__/DEMMO')
 
 import constants
 
+
+
 class Map:
     """
     Class representing the map of the game with tiles at each square in the grid
@@ -151,10 +153,10 @@ class Game:
         Helper method for creating the top portion of the server map
         :return: the top of the server map (grid portion)
         """
-        divider = "{}".format('-'*self.map_constants.DIVIDER_MULTIPLIER*self.map.columns)
+        divider = "{}".format('-'*(self.map_constants.DIVIDER_MULTIPLIER*self.map.columns+1))
 
         # Generate the top half of the map (grid)
-        map_list = ["{}\n".format(divider)] # list to hold to the string representation of the map temporarily
+        map_list = ["{}<br>".format(divider)] # list to hold to the string representation of the map temporarily
         for row in range(self.map.rows):
             for col in range(self.map.columns):
                 map_list.append("|")
@@ -162,15 +164,15 @@ class Game:
 
                 # Add padding to make this tile the same size as the other tiles
                 if len(tile_number) < self.map_constants.TILE_SIZE:
-                    spaces = ' ' *  (self.map_constants.TILE_SIZE - len(tile_number))
+                    spaces = '&nbsp&nbsp' *  (self.map_constants.TILE_SIZE - len(tile_number))
                     tile_number = spaces + tile_number
 
                 map_list.append(tile_number)
                 # append "|" at the end of a row
                 if col == self.map.columns - 1:
                     map_list.append("|")
-            map_list.append("\n{}\n".format(divider)) # add a divider --------- at the end of each row
-        map_list.append("\n")
+            map_list.append("<br>{}<br>".format(divider)) # add a divider --------- at the end of each row
+        map_list.append("<br>")
         return ''.join(map_list)
 
     def _get_bottom_server_map(self):
@@ -186,20 +188,20 @@ class Game:
             tile = self.map.get_tile(row, col)
             # Add the tile string representation if the tile is not empty
             if not tile.is_empty():
-                indent = '\t' * self.map_constants.TILE_INDENT
-                temp_list = ["[{}]:\n".format(tile_number)]  # temporary list to hold the string representation of the tile
+                indent = '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp' * self.map_constants.TILE_INDENT
+                temp_list = ["[{}]:<br>".format(tile_number)]  # temporary list to hold the string representation of the tile
                 # Add all the players to the string
                 if tile.players:
-                    temp_list.append(indent + "Player(s):\n")
+                    temp_list.append(indent + "Player(s):<br>")
                     for player_id in tile.players:
                         player = self.id_to_players[player_id]
-                        temp_list.append(indent + "\t{}\n".format(player.__str__(self.map_constants.ONLY_ID)))
+                        temp_list.append(indent * 2 + "{}<br>".format(player.__str__(self.map_constants.ONLY_ID)))
                 # Add all the monsters to the string
                 if tile.monsters:
-                    temp_list.append(indent + "Monster(s):\n")
+                    temp_list.append(indent + "Monster(s):<br>")
                     for monster_id in tile.monsters:
                         monster = self.id_to_monsters[monster_id]
-                        temp_list.append(indent + "\t{}\n".format(monster.__str__(self.map_constants.ONLY_ID)))
+                        temp_list.append(indent * 2 + "{}<br>".format(monster.__str__(self.map_constants.ONLY_ID)))
                 map_list.extend(temp_list)
 
         # Finally, return the map as a sting

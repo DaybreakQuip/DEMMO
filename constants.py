@@ -50,7 +50,7 @@ class Database:
 # Game constants
 class Game:
     class ServerMap:
-        DIVIDER_MULTIPLIER = 4 # Determines size of the divider -> larger number = longer divider
+        DIVIDER_MULTIPLIER = 5 # Determines size of the divider -> larger number = longer divider
         TILE_SIZE = 3 # size of each tile on the map
         ONLY_ID = False # whether or not to display only id of each player or monster
         TILE_INDENT = 1 # amount of indent for each tile
