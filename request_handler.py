@@ -13,36 +13,32 @@ def handle_get(request):
     :return: result from GET request
     """
     values = request.get('values', {})
-    try:
-        option = values['option']
-        if option== "game_map":
-            game = Deserialize.createGameFromDatabase()
-            return game.get_server_map()
-        elif option == "player":
-            player_id = values['id']
-            player = Database.get_player_info(player_id)
-            return player
-    except Exception as e:
-        return "Invalid request: {}; Exception: {}".format(request, e)
+    # TODO: Catch exceptions
+    option = values['option']
+    if option== "game_map":
+        game = Deserialize.createGameFromDatabase()
+        return game.get_server_map()
+    elif option == "player":
+        player_id = values['id']
+        player = Database.get_player_info(player_id)
+        return player
 
 def handle_post(request):
     form = request.get('form', {})
 
-    try:
-        # TODO: Change this to player_id & action in the future, for now it is just creating
-        #       a player with that id in that location (row, col)
-        player_id = form['player_id']
-        row = int(form['row'])
-        col = int(form['col'])
-        # Create a new player
-        player = Player(id, row, col)
-        # Add player to database
-        Serialize.updatePlayer(player)
-        # Return information about the player just added
-        return player
+    # TODO: Change this to player_id & action in the future, for now it is just creating
+    #       a player with that id in that location (row, col)
 
-    except Exception as e:
-        return "Invalid request: {}; Exception: {}".format(request, e)
+    # TODO: Catch exceptions
+    player_id = form['player_id']
+    row = int(form['row'])
+    col = int(form['col'])
+    # Create a new player
+    player = Player(id, row, col)
+    # Add player to database
+    Serialize.updatePlayer(player)
+    # Return information about the player just added
+    return player
 
 def request_handler(request=None):
     method = request.get("method")

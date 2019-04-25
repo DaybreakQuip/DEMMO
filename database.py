@@ -265,20 +265,19 @@ class Deserialize:
 		:return: new Game object populated with all game objects in the database
 		"""
 		# Load default map information
-		map_file = open(map_path)
-		map_data = json.load(map_file)
-		rows, columns = map_data['rows'], map_data['columns']
+		with open(map_path) as map_file:
+			map_data = json.load(map_file)
+			rows, columns = map_data['rows'], map_data['columns']
 
-		# Get player and monster information
-		monsters = []
-		players = []
-		for monster_info in Database.get_all_monsters(database):
-			monsters.append(cls.createMonsterObject(monster_info))
-		for player_info in Database.get_all_players(database):
-			players.append(cls.createPlayerObject(player_info))
+			# Get player and monster information
+			monsters = []
+			players = []
+			for monster_info in Database.get_all_monsters(database):
+				monsters.append(cls.createMonsterObject(monster_info))
+			for player_info in Database.get_all_players(database):
+				players.append(cls.createPlayerObject(player_info))
 
-		map_file.close()
-		return Game(rows, columns, players, monsters)
+			return Game(rows, columns, players, monsters)
 
 	@classmethod
 	def createGameWithinRange(cls, row, col):
