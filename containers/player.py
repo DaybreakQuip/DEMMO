@@ -1,4 +1,4 @@
-from game_object import GameObject
+from containers.game_object import GameObject
 import constants
 
 class Player(GameObject):
@@ -68,3 +68,20 @@ class Player(GameObject):
         """
         # TODO: implement me
         pass
+
+    def __str__(self, only_id=False):
+        """
+        :return: string representation of the game object
+        """
+        if only_id:
+            return self.id
+
+        return "(id: {}, health: {}, power: {}, gold: {}, bosses defeated: {})".format(
+            self.id, self.health, self.power, self.gold, self.num_boss_defeated
+        )
+
+
+if __name__ == '__main__':
+    if constants.TESTING:
+        player = Player("Bob", 0, 0)
+        print(player)

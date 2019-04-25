@@ -215,8 +215,8 @@ if __name__ == '__main__':
     # Run this code if testing is true, set to off otherwise! (real test cases are probably better :))
     if constants.TESTING:
         # Code for creating a dummy game and printing it
-        from player import Player
-        from monster import Monster
+        from containers.player import Player
+        from containers.monster import Monster
         rows = 5
         columns = 5
         players = [

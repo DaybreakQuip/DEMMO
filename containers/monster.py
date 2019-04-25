@@ -1,4 +1,4 @@
-from game_object import GameObject
+from containers.game_object import GameObject
 
 class Monster(GameObject):
     def __init__(self, id, row, col, health, power, is_boss=False, defeated_by=None):
@@ -26,3 +26,14 @@ class Monster(GameObject):
         :param damage: the amount of damage dealt to the monster, must be > 0
         """
         self.updateHealth(-damage)
+
+    def __str__(self, only_id=False):
+        """
+        :return: string representation of the game object
+        """
+        if only_id:
+            return self.id
+
+        return "(id: {}, health: {}, power: {}, is boss: {}, defeated by: {})".format(
+            self.id, self.health, self.power, self.is_boss, self.defeated_by
+        )

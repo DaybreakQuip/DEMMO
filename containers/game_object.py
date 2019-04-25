@@ -22,7 +22,7 @@ class GameObject():
         """
         Returns whether the game object is alive or not
         """
-        return self.health == 0
+        return self.health > 0
 
     def getLocation(self):
         """
