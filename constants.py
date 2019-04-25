@@ -1,11 +1,12 @@
 import sys
 sys.path.append('__HOME__/DEMMO')
 
-# Whether or not we are print testing in non-test.py files (e.g. database.py)
+# Whether or not we are running __main__ in non-test.py files (e.g. database.py)
 TESTING = False
 # Whether or not this is the server
 IS_SERVER = True
 
+# Change first one to your server directory if you're uploading to your server
 PROJECT_HOME = '/var/jail/home/yanniw/DEMMO/' if IS_SERVER else ""
 
 # Default player values
@@ -18,34 +19,32 @@ class Player:
 # Shop costs
 class Shop:
     BASE_HEALTH_COST = 100
-    BASE_POWER_COST = 100
+    BASE_POWER_COST  = 100
 
 # Database constants
 class Database:
-    TEST_GAME_DB = "test_game_info.db"
-    GAME_DB = "game_info.db"
-    TRUE = "True"
-    FALSE = "False"
+    TEST_GAME_DB    = "test_game_info.db"
+    GAME_DB         = "game_info.db"
+    TRUE            = "True" # for storing in the database
+    FALSE           = "False"
 
     # JSON files
-    MAP_FILE = "map.json"
-    TEST_MAP_FILE = "test_map.json"
-    MONSTER_FILE = "monsters.json"
+    MAP_FILE        = "map.json"
+    TEST_MAP_FILE   = "test_map.json"
+    MONSTER_FILE    = "monsters.json"
 
     # Directory paths
     # resources path based on server or local
-    RESOURCES_DIR = PROJECT_HOME + "resources/"
-    # database and map paths
-    DATABASE_PATH = RESOURCES_DIR+GAME_DB
-    MAP_PATH = RESOURCES_DIR+MAP_FILE
-    MONSTER_PATH = RESOURCES_DIR+MONSTER_FILE
+    RESOURCES_DIR   = PROJECT_HOME + "resources/"
+    DATABASE_PATH   = RESOURCES_DIR+GAME_DB
+    MAP_PATH        = RESOURCES_DIR+MAP_FILE
+    MONSTER_PATH    = RESOURCES_DIR+MONSTER_FILE
 
     # (Testing) Directory paths
     # resources path based on server or local
     TEST_RESOURCES_DIR = "test_resources/"
-    # database and map paths
     TEST_DATABASE_PATH = TEST_RESOURCES_DIR+TEST_GAME_DB
-    TEST_MAP_PATH = TEST_RESOURCES_DIR+TEST_MAP_FILE
+    TEST_MAP_PATH      = TEST_RESOURCES_DIR+TEST_MAP_FILE
 
 # Game constants
 class Game:
