@@ -42,7 +42,7 @@ class Database:
 
     # (Testing) Directory paths
     # resources path based on server or local
-    TEST_RESOURCES_DIR = PROJECT_HOME + "test_resources/"
+    TEST_RESOURCES_DIR = "test_resources/"
     # database and map paths
     TEST_DATABASE_PATH = TEST_RESOURCES_DIR+TEST_GAME_DB
     TEST_MAP_PATH = TEST_RESOURCES_DIR+TEST_MAP_FILE

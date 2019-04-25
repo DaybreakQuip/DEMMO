@@ -146,4 +146,4 @@ class TestSerialize(unittest.TestCase):
                          Database.get_all_players(test_database))
 
         # delete all tables created in this test
-        Database.delete_tables()
+        Database.delete_tables(test_database)
