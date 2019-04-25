@@ -352,7 +352,26 @@ class Serialize:
 
 if __name__ == "__main__":
 	if constants.TESTING:
+		"""
 		import reset_game_database
 		reset_game_database.resetDatabase()
 
 		print(Database.get_all_monsters())
+		
+		players = [
+			Player("Lucian", 0, 0, 100, 5, 2, 1),
+			Player("Caitlyn", 1, 1),
+			Player("Teemo", 2, 4),
+			Player("Ze", 4, 2, 200, 50, 50, 10)
+		]
+
+		monsters = [
+			Monster("Crab", 0, 0, 100, 100, False, {"Lucian"}),
+		]
+		
+
+		Serialize.updateGameObjects(players+monsters)
+
+		print(Database.get_all_players())
+		"""
+		pass
