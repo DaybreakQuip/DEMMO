@@ -28,9 +28,9 @@ class Database:
     FALSE = "False"
 
     # JSON files
-    MAP_FILE = "map.JSON"
-    TEST_MAP_FILE = "test_map.JSON"
-    MONSTER_FILE = "monsters.JSON"
+    MAP_FILE = "map.json"
+    TEST_MAP_FILE = "test_map.json"
+    MONSTER_FILE = "monsters.json"
 
     # Directory paths
     # resources path based on server or local
