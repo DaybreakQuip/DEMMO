@@ -11,7 +11,9 @@ from containers.monster import Monster
 from containers.game import Game
 
 class Database:
-
+	"""
+	This class contains class methods for operating on the database directly
+	"""
 	@classmethod
 	def create_game_object_tables(cls, database=db_constants.DATABASE_PATH):
 		'''
@@ -234,7 +236,7 @@ class Database:
 
 class Deserialize:
 	"""
-	This class contains class methods for retrieving objects from the database
+	This class contains class methods that deserialize objects from the database
 	"""
 	@classmethod
 	def createPlayerObject(cls, player_info):
@@ -291,7 +293,7 @@ class Deserialize:
 
 class Serialize:
 	"""
-	This class contains class methods for saving objects to the database
+	This class contains class methods to serialize and save objects to the database
 	"""
 	@classmethod
 	def updateMonster(cls, monster, database=db_constants.DATABASE_PATH):
