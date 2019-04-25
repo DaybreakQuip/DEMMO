@@ -1,0 +1,9 @@
+{
+  "monsters": [
+    {
+      "id": 0,
+      "health": 1,
+      "power": 1
+    }
+  ]
+}
