@@ -2,11 +2,11 @@ import sys
 sys.path.append('__HOME__/DEMMO')
 
 # Whether or not we are print testing in non-test.py files (e.g. database.py)
-TESTING = True
+TESTING = False
 # Whether or not this is the server
-IS_SERVER = False
+IS_SERVER = True
 
-PROJECT_HOME = '__HOME__/DEMMO/' if IS_SERVER else ""
+PROJECT_HOME = '/var/jail/home/yanniw/DEMMO/' if IS_SERVER else ""
 
 # Default player values
 class Player:

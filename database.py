@@ -234,8 +234,8 @@ class Database:
 
 class Deserialize:
 	"""
-    This class contains class methods for retrieving objects from the database
-    """
+	This class contains class methods for retrieving objects from the database
+	"""
 	@classmethod
 	def createPlayerObject(cls, player_info):
 		"""
@@ -264,9 +264,8 @@ class Deserialize:
 		Creates and returns a new Game object that contains all game objects in the database
 		:return: new Game object populated with all game objects in the database
 		"""
-		# Load default map information
-		with open(map_path) as map_file:
-			map_data = json.load(map_file)
+		with open(map_path) as f:
+			map_data = json.load(f)
 			rows, columns = map_data['rows'], map_data['columns']
 
 			# Get player and monster information
@@ -292,8 +291,8 @@ class Deserialize:
 
 class Serialize:
 	"""
-    This class contains class methods for saving objects to the database
-    """
+	This class contains class methods for saving objects to the database
+	"""
 	@classmethod
 	def updateMonster(cls, monster, database=db_constants.DATABASE_PATH):
 		"""
