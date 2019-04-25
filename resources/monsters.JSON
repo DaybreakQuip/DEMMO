@@ -1,9 +1,40 @@
 {
   "monsters": [
     {
-      "id": 0,
-      "health": 1,
-      "power": 1
+      "id": "Dragon",
+      "row": 3,
+      "col": 1,
+      "health": 1000,
+      "power": 5,
+      "is_boss": true,
+      "defeated_by": []
+    },
+    {
+      "id": "Baron",
+      "row": 4,
+      "col": 4,
+      "health": 9000,
+      "power": 20,
+      "is_boss": true,
+      "defeated_by": []
+    },
+    {
+      "id": "Red_Minion",
+      "row": 1,
+      "col": 0,
+      "health": 10,
+      "power": 1,
+      "is_boss": false,
+      "defeated_by": []
+    },
+    {
+      "id": "Blue_Minion",
+      "row": 1,
+      "col": 2,
+      "health": 10,
+      "power": 1,
+      "is_boss": false,
+      "defeated_by": []
     }
   ]
 }
