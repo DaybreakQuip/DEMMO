@@ -1,1 +1,5 @@
 .idea/
+__pycache__/
+containers/__pycache__/
+resources/game_info.db
+test_resources/test_game_info.db
