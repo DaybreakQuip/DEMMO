@@ -1,3 +1,6 @@
+import sys
+sys.path.append('__HOME__/DEMMO')
+
 import unittest
 import constants
 from database import Database, Deserialize, Serialize

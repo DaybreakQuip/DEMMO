@@ -1,3 +1,6 @@
+import sys
+sys.path.append('__HOME__/DEMMO')
+
 import constants
 
 class Map:

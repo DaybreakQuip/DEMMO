@@ -1,3 +1,6 @@
+import sys
+sys.path.append('__HOME__/DEMMO')
+
 from containers.game_object import GameObject
 
 class Monster(GameObject):

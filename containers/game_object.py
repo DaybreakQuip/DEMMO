@@ -1,3 +1,6 @@
+import sys
+sys.path.append('__HOME__/DEMMO')
+
 class GameObject():
     """
     Class representing a game object, which is a unit in the game with id, health, and power

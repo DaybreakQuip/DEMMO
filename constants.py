@@ -1,3 +1,6 @@
+import sys
+sys.path.append('__HOME__/DEMMO')
+
 # Whether or not we are print testing in non-test.py files (e.g. database.py)
 TESTING = True
 # Whether or not this is the server

@@ -3,6 +3,9 @@ This script resets the game database to only having default monsters when you ru
 
 It clears all previous information, so don't run it unless you know what you're doing
 """
+import sys
+sys.path.append('__HOME__/DEMMO')
+
 import constants
 import json
 from containers.monster import Monster

@@ -1,3 +1,6 @@
+import sys
+sys.path.append('__HOME__/DEMMO')
+
 from database import Database, Serialize, Deserialize
 from containers.player import Player
 from containers.monster import Monster
@@ -19,8 +22,8 @@ def handle_get(request):
             player_id = values['id']
             player = Database.get_player_info(player_id)
             return player
-    except:
-        return "Invalid request: {}".format(request)
+    except Exception as e:
+        return "Invalid request: {}; Exception: {}".format(request, e)
 
 def handle_post(request):
     form = request.get('form', {})
@@ -38,8 +41,8 @@ def handle_post(request):
         # Return information about the player just added
         return player
 
-    except:
-        return "Invalid request: {}".format(request)
+    except Exception as e:
+        return "Invalid request: {}; Exception: {}".format(request, e)
 
 def request_handler(request=None):
     method = request.get("method")
