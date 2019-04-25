@@ -21,7 +21,7 @@ def handle_get(request):
     elif option == "player":
         player_id = values['id']
         player = Database.get_player_info(player_id)
-        return player
+        return str(Deserialize.createPlayerObject(player))
 
 def handle_post(request):
     form = request.get('form', {})
