@@ -11,6 +11,18 @@ import json
 from containers.monster import Monster
 from database import Database, Serialize
 
+def resetDatabase():
+    # Next, parse the monsters json file to create monster objects
+    monsters = create_default_monsters()
+    # Create empty tables in the database
+    Database.create_game_object_tables()
+    # Lastly, add the default monsters to the database
+    Serialize.updateGameObjects(monsters)
+
+def request_handler(request=None):
+    resetDatabase()
+    return "Reset database successful"
+
 def create_default_monsters():
     """
     :return: list of default monsters
@@ -32,14 +44,12 @@ def create_default_monsters():
         return monsters
 
 if __name__ == "__main__":
-    print("Resetting game database...")
-    # Delete any pre-existing tables to clear any previous monster or player information
-    Database.delete_tables()
-    # Now create empty tables in the database
-    Database.create_game_object_tables()
-    # Next, parse the monsters json file to create monster objects
-    monsters = create_default_monsters()
-    # Lastly, add the default monsters to the database
-    Serialize.updateGameObjects(monsters)
-    print("Done!")
+    if not constants.IS_SERVER:
+        print("Resetting game database...")
+        # LOCAL only
+        # Delete any pre-existing tables to clear any previous monster or player information
+        Database.delete_tables()
+        resetDatabase()
+
+        print("Done!")
 

@@ -61,14 +61,14 @@ class Database:
 
 		# Determine whether the player exists in the database
 		player_exists = c.execute(
-			'''SELECT EXISTS(SELECT 1 FROM player_table WHERE id = ?)''', (id, )).fetchone()[0]
+			'''SELECT EXISTS(SELECT 1 FROM player_table WHERE id = ?);''', (id, )).fetchone()[0]
 		if not player_exists: # Create a new player entry if the player does not exist
 			c.execute(
-				'''INSERT into player_table VALUES(?, ?, ?, ?, ?, ?, ?)''',
+				'''INSERT into player_table VALUES(?, ?, ?, ?, ?, ?, ?);''',
 				(id, row, col, health, power, gold, num_bosses_defeated))
 		else: # Update the existing player if the player exists
 			c.execute(
-				'''UPDATE player_table SET row = ?, col = ?, health = ?, power = ?, gold = ?, num_bosses_defeated = ? WHERE id = ?''',
+				'''UPDATE player_table SET row = ?, col = ?, health = ?, power = ?, gold = ?, num_bosses_defeated = ? WHERE id = ?;''',
 				(row, col, health, power, gold, num_bosses_defeated, id))
 
 		conn.commit()  # commit commands
@@ -92,14 +92,14 @@ class Database:
 
 		# Determine whether the player exists in the database
 		monster_exists = c.execute(
-			'''SELECT EXISTS(SELECT 1 FROM monster_table WHERE id = ?)''', (id, )).fetchone()[0]
+			'''SELECT EXISTS(SELECT 1 FROM monster_table WHERE id = ?);''', (id, )).fetchone()[0]
 		if not monster_exists: # Create a new player entry if the player does not exist
 			c.execute(
-				'''INSERT into monster_table VALUES(?, ?, ?, ?, ?, ?, ?)''',
+				'''INSERT into monster_table VALUES(?, ?, ?, ?, ?, ?, ?);''',
 				(id, row, col, health, power, is_boss, defeated_by))
 		else: # Update the existing player if the player exists
 			c.execute(
-				'''UPDATE monster_table SET row = ?, col = ?, health = ?, power = ?, is_boss = ?, defeated_by = ? WHERE id = ?''',
+				'''UPDATE monster_table SET row = ?, col = ?, health = ?, power = ?, is_boss = ?, defeated_by = ? WHERE id = ?;''',
 				(row, col, health, power, is_boss, defeated_by, id))
 
 		conn.commit()  # commit commands
@@ -113,7 +113,7 @@ class Database:
 		conn = sqlite3.connect(database)  # connect to that database (will create if it doesn't already exist)
 		c = conn.cursor()  # make cursor into database (allows us to execute commands)
 		# Query for all players
-		players = c.execute('''SELECT * FROM player_table''').fetchall()
+		players = c.execute('''SELECT * FROM player_table;''').fetchall()
 		conn.commit()  # commit commands
 		conn.close()  # close connection to database
 
@@ -127,7 +127,7 @@ class Database:
 		conn = sqlite3.connect(database)  # connect to that database (will create if it doesn't already exist)
 		c = conn.cursor()  # make cursor into database (allows us to execute commands)
 		# Query for all monsters
-		monsters = c.execute('''SELECT * FROM monster_table''').fetchall()
+		monsters = c.execute('''SELECT * FROM monster_table;''').fetchall()
 		conn.commit()  # commit commands
 		conn.close()  # close connection to database
 
@@ -351,6 +351,8 @@ class Serialize:
 				self.updatePlayer(game_object, database)
 
 if __name__ == "__main__":
-
 	if constants.TESTING:
+		import reset_game_database
+		reset_game_database.resetDatabase()
+
 		print(Database.get_all_monsters())
