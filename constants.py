@@ -1,5 +1,6 @@
 import sys
 sys.path.append('__HOME__/DEMMO')
+import server_path
 
 # Whether or not we are running __main__ in non-test.py files (e.g. database.py)
 TESTING = False
@@ -7,10 +8,12 @@ TESTING = False
 IS_SERVER = True
 
 # Change first one to your server directory if you're uploading to your server
-PROJECT_HOME = '/var/jail/home/yanniw/DEMMO/' if IS_SERVER else ""
+PROJECT_HOME = server_path.SERVER_PATH if IS_SERVER else ""
 
 # Default player values
 class Player:
+    DEFAULT_ROW = 0
+    DEFAULT_COL = 0
     DEFAULT_HEALTH = 5
     DEFAULT_POWER = 5
     DEFAULT_GOLD = 0
@@ -49,7 +52,7 @@ class Database:
 # Game constants
 class Game:
     class ServerMap:
-        DIVIDER_MULTIPLIER = 5 # Determines size of the divider -> larger number = longer divider
+        DIVIDER_MULTIPLIER = 4 # Determines size of the divider -> larger number = longer divider
         TILE_SIZE = 3 # size of each tile on the map
         ONLY_ID = False # whether or not to display only id of each player or monster
         TILE_INDENT = 1 # amount of indent for each tile

@@ -19,10 +19,6 @@ def resetDatabase():
     # Lastly, add the default monsters to the database
     Serialize.updateGameObjects(monsters)
 
-def request_handler(request=None):
-    resetDatabase()
-    return "Reset database successful"
-
 def create_default_monsters():
     """
     :return: list of default monsters
@@ -42,6 +38,16 @@ def create_default_monsters():
             monsters.append(Monster(id, row, col, health, power, is_boss, defeated_by))
 
         return monsters
+
+def request_handler(request=None):
+    """
+    Returns the game database with default monsters and no players
+    :param request: not used
+    :return: (string) indicating success
+    """
+    Database.delete_tables()
+    resetDatabase()
+    return "Reset database successful"
 
 if __name__ == "__main__":
     if not constants.IS_SERVER:

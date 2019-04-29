@@ -5,10 +5,12 @@ from containers.game_object import GameObject
 import constants
 
 class Player(GameObject):
-    def __init__(self, id, row, col, health=constants.Player.DEFAULT_HEALTH,
-                                     power=constants.Player.DEFAULT_POWER,
-                                     gold=constants.Player.DEFAULT_GOLD,
-                                     num_boss_defeated=constants.Player.DEFAULT_BOSS_DEFEATED):
+    def __init__(self, id, row=constants.Player.DEFAULT_ROW,
+                           col=constants.Player.DEFAULT_COL,
+                           health=constants.Player.DEFAULT_HEALTH,
+                           power=constants.Player.DEFAULT_POWER,
+                           gold=constants.Player.DEFAULT_GOLD,
+                           num_boss_defeated=constants.Player.DEFAULT_BOSS_DEFEATED):
         """
         Initializes a new Player object
         :param id: player id

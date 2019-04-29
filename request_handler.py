@@ -8,14 +8,14 @@ from containers.monster import Monster
 def handle_get(request):
     """
     # TODO: Add more options to this / refine it
-    Handles GET request
+    Handles GET requests
     :param request: the current get request
     :return: result from GET request
     """
     values = request.get('values', {})
     # TODO: Catch exceptions
     option = values['option']
-    if option== "game_map":
+    if option== "map":
         game = Deserialize.createGameFromDatabase()
         return game.get_server_map()
     elif option == "player":
@@ -24,21 +24,32 @@ def handle_get(request):
         return str(Deserialize.createPlayerObject(player))
 
 def handle_post(request):
+    """
+    Handle POST requests
+    :param request: request containing 'player_id' and 'action' inside the 'form' of the request
+    :return: response based on request
+    """
+    # Get arguments from the request
     form = request.get('form', {})
-
-    # TODO: Change this to player_id & action in the future, for now it is just creating
-    #       a player with that id in that location (row, col)
-
-    # TODO: Catch exceptions
     player_id = form['player_id']
-    row = int(form['row'])
-    col = int(form['col'])
-    # Create a new player
-    player = Player(id, row, col)
-    # Add player to database
-    Serialize.updatePlayer(player)
-    # Return information about the player just added
-    return player
+    action = form['action']
+
+    changed_game_objects = [] # list of game objects that have changed
+
+    # Create a game from the database
+    game = Deserialize.createGameFromDatabase()
+    # If the player_id does not exist, create a new player and add it to the game
+    if player_id not in game.id_to_players:
+        player = Player(player_id)
+        game.add_player(player)
+        changed_game_objects.append(player)
+
+    # Execute the player's action and keep track of game objects that changed
+    changed_game_objects.extend(game.execute(player_id, action))
+
+    # Update and store all game objects that have changed
+    Serialize.updateGameObjects(changed_game_objects)
+    return "Success"
 
 def request_handler(request=None):
     method = request.get("method")

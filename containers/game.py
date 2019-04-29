@@ -1,9 +1,6 @@
 import sys
 sys.path.append('__HOME__/DEMMO')
-
 import constants
-
-
 
 class Map:
     """
@@ -123,30 +120,46 @@ class Game:
         self.map = Map(rows, columns) # a list of list of tiles
         # Populate the game map with players in the corresponding locations
         for player in players:
-            player_id = player.id
-            self.id_to_players[player_id] = player
-            # Add player id to a tile
-            row, col = player.getLocation()
-            tile = self.map.get_tile(row, col)
-            tile.add_player(player_id)
+            self.add_player(player)
 
         # Populate the game map with monsters in the corresponding locations
         for monster in monsters:
-            monster_id = monster.id
-            self.id_to_monsters[monster_id] = monster
-            # Add monster id to a tile
-            row, col = monster.getLocation()
-            tile = self.map.get_tile(row, col)
-            tile.add_monster(monster_id)
+            self.add_monster(monster)
 
-    def execute(self, playerAction):
+    def add_player(self, player):
+        """
+        Adds a new player to the game
+        :param player: (Player) to add to the game
+        :return: None
+        """
+        player_id = player.id
+        self.id_to_players[player_id] = player
+        # Add player id to a tile
+        row, col = player.getLocation()
+        tile = self.map.get_tile(row, col)
+        tile.add_player(player_id)
+
+    def add_monster(self, monster):
+        """
+        Add a new monster to the game
+        :param monster: (Monster) to add to the game
+        :return: None
+        """
+        monster_id = monster.id
+        self.id_to_monsters[monster_id] = monster
+        # Add monster id to a tile
+        row, col = monster.getLocation()
+        tile = self.map.get_tile(row, col)
+        tile.add_monster(monster_id)
+
+    def execute(self, player_id, action):
         """
         Executes a player action
         :param playerAction: (string) representing the player action
         :return: a list of game objects that have changed from executing player action
         """
         # TODO: Add player actions to constants.py and implement them here
-        pass
+        return [] # TODO: Change this to actually returning a list of game objects that changed
 
     def _get_top_server_map(self):
         """
@@ -156,7 +169,7 @@ class Game:
         divider = "{}".format('-'*(self.map_constants.DIVIDER_MULTIPLIER*self.map.columns+1))
 
         # Generate the top half of the map (grid)
-        map_list = ["{}<br>".format(divider)] # list to hold to the string representation of the map temporarily
+        map_list = ["{}\n".format(divider)] # list to hold to the string representation of the map temporarily
         for row in range(self.map.rows):
             for col in range(self.map.columns):
                 map_list.append("|")
@@ -164,15 +177,15 @@ class Game:
 
                 # Add padding to make this tile the same size as the other tiles
                 if len(tile_number) < self.map_constants.TILE_SIZE:
-                    spaces = '&nbsp&nbsp' *  (self.map_constants.TILE_SIZE - len(tile_number))
+                    spaces = ' ' *  (self.map_constants.TILE_SIZE - len(tile_number))
                     tile_number = spaces + tile_number
 
                 map_list.append(tile_number)
                 # append "|" at the end of a row
                 if col == self.map.columns - 1:
                     map_list.append("|")
-            map_list.append("<br>{}<br>".format(divider)) # add a divider --------- at the end of each row
-        map_list.append("<br>")
+            map_list.append("\n{}\n".format(divider)) # add a divider --------- at the end of each row
+        map_list.append("\n")
         return ''.join(map_list)
 
     def _get_bottom_server_map(self):
@@ -188,20 +201,20 @@ class Game:
             tile = self.map.get_tile(row, col)
             # Add the tile string representation if the tile is not empty
             if not tile.is_empty():
-                indent = '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp' * self.map_constants.TILE_INDENT
-                temp_list = ["[{}]:<br>".format(tile_number)]  # temporary list to hold the string representation of the tile
+                indent = '\t' * self.map_constants.TILE_INDENT
+                temp_list = ["[{}]:\n".format(tile_number)]  # temporary list to hold the string representation of the tile
                 # Add all the players to the string
                 if tile.players:
-                    temp_list.append(indent + "Player(s):<br>")
+                    temp_list.append(indent + "Player(s):\n")
                     for player_id in tile.players:
                         player = self.id_to_players[player_id]
-                        temp_list.append(indent * 2 + "{}<br>".format(player.__str__(self.map_constants.ONLY_ID)))
+                        temp_list.append(indent * 2 + "{}\n".format(player.__str__(self.map_constants.ONLY_ID)))
                 # Add all the monsters to the string
                 if tile.monsters:
-                    temp_list.append(indent + "Monster(s):<br>")
+                    temp_list.append(indent + "Monster(s):\n")
                     for monster_id in tile.monsters:
                         monster = self.id_to_monsters[monster_id]
-                        temp_list.append(indent * 2 + "{}<br>".format(monster.__str__(self.map_constants.ONLY_ID)))
+                        temp_list.append(indent * 2 + "{}\n".format(monster.__str__(self.map_constants.ONLY_ID)))
                 map_list.extend(temp_list)
 
         # Finally, return the map as a sting
@@ -213,8 +226,7 @@ class Game:
                     monsters and players visible where the top is a numbered grid of the board and the bottom is
                     a list of all the players and monsters on each of the tiles
         """
-        return self._get_top_server_map() + self._get_bottom_server_map()
-
+        return "<xmp>" + self._get_top_server_map() + self._get_bottom_server_map() + "</xmp>"
 
 if __name__ == '__main__':
     # Run this code if testing is true, set to off otherwise! (real test cases are probably better :))
