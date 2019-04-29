@@ -158,8 +158,16 @@ class Game:
         :param playerAction: (string) representing the player action
         :return: a list of game objects that have changed from executing player action
         """
-        # TODO: Add player actions to constants.py and implement them here
-        return [] # TODO: Change this to actually returning a list of game objects that changed
+        changed_objects = []
+        if action == constants.Game.DOWN:
+            changed_objects.append(self.id_to_players[player_id].move_down())
+        if action == constants.Game.UP:
+            changed_objects.append(self.id_to_players[player_id].move_up())
+        if action == constants.Game.LEFT:
+            changed_objects.append(self.id_to_players[player_id].move_left())
+        if action == constants.Game.RIGHT:
+            changed_objects.append(self.id_to_players[player_id].move_right())
+        return changed_objects
 
     def _get_top_server_map(self):
         """

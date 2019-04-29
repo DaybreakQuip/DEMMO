@@ -147,3 +147,53 @@ class TestSerialize(unittest.TestCase):
 
         # delete all tables created in this test
         Database.delete_tables(test_database)
+
+class TestAction(unittest.TestCase):
+    def setUp(self):
+        Database.delete_tables(test_database)
+
+    def testUpdateGameObjects(self):
+        # Create the tables
+        Database.create_game_object_tables(test_database)
+        # Assert there's nothing in them right now
+        self.assertEqual([], Database.get_all_players(test_database))
+        self.assertEqual([], Database.get_all_monsters(test_database))
+
+        # Create players and monsters to serialize
+        players = [
+            Player("MoveLeftWall", 3, 0, 1000, 5, 0, 0),
+            Player("MoveRightWall", 1, 9, 1, 999, 1, 100),
+            Player("MoveUpWall", 0, 5, 1000, 5, 0, 0),
+            Player("MoveDownWall", 9, 3, 1000, 5, 0, 0),
+            Player("MoveLeft", 3, 2, 1000, 5, 0, 0),
+            Player("MoveRight", 1, 7, 1, 999, 1, 100),
+            Player("MoveUp", 3, 5, 1000, 5, 0, 0),
+            Player("MoveDown", 5, 3, 1000, 5, 0, 0),
+        ]
+        monsters = [
+            Monster("NotAMonster", 2, 1, 10, 1, False, {}),
+            Monster("NotABoss", 0, 1, 10, 5, True, {"NotZe"})
+        ]
+        new_game = Game(10,10, players, monsters)
+        game_objects = []
+        game_objects.extend(new_game.execute("MoveLeftWall", "left"))
+        game_objects.extend(new_game.execute("MoveRightWall", "right"))
+        game_objects.extend(new_game.execute("MoveUpWall", "up"))
+        game_objects.extend(new_game.execute("MoveDownWall", "down"))
+        game_objects.extend(new_game.execute("MoveLeft", "left"))
+        game_objects.extend(new_game.execute("MoveRight", "right"))
+        game_objects.extend(new_game.execute("MoveUp", "up"))
+        game_objects.extend(new_game.execute("MoveDown", "down"))
+        game_objects = game_objects + monsters
+        # Serialize and check if database is updated
+        Serialize.updateGameObjects(game_objects, test_database)
+
+        self.assertEqual([('NotAMonster', 2, 1, 10, 1, 'False', '{}'), ('NotABoss', 0, 1, 10, 5, 'True', "{'NotZe'}")],
+                         Database.get_all_monsters(test_database))
+        self.assertEqual([("MoveLeftWall", 3, 0, 1000, 5, 0, 0), ("MoveRightWall", 1, 9, 1, 999, 1, 100),
+                          ("MoveUpWall", 0, 5, 1000, 5, 0, 0), ("MoveDownWall", 9, 3, 1000, 5, 0, 0), ("MoveLeft", 3, 1, 1000, 5, 0, 0),
+                          ("MoveRight", 1, 8, 1, 999, 1, 100), ("MoveUp", 2, 5, 1000, 5, 0, 0), ("MoveDown", 6, 3, 1000, 5, 0, 0)],
+                         Database.get_all_players(test_database))
+
+        # delete all tables created in this test
+        Database.delete_tables(test_database)

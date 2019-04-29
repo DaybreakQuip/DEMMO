@@ -51,6 +51,10 @@ class Database:
 
 # Game constants
 class Game:
+    DOWN        = "down"
+    UP          = "up"
+    LEFT        = "left"
+    RIGHT       = "right"
     class ServerMap:
         DIVIDER_MULTIPLIER = 4 # Determines size of the divider -> larger number = longer divider
         TILE_SIZE = 3 # size of each tile on the map
