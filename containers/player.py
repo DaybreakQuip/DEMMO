@@ -49,9 +49,8 @@ class Player(GameObject):
         """
         # TODO Implement me
         if 0 < self.row <= 9:
-            return Player(self.id, self.row - 1, self.col, self.health, self.power,self.gold,self.num_boss_defeated)
-        else:
-            return self
+           self.row -= 1
+        return self
 
     def move_down(self):
         """
@@ -59,27 +58,24 @@ class Player(GameObject):
         :return:
         """
         if 0 <= self.row < 9:
-            return Player(self.id, self.row + 1, self.col, self.health, self.power,self.gold,self.num_boss_defeated)
-        else:
-            return self
+            self.row += 1
+        return self
     def move_left(self):
         """
         Move the player left one spot
         :return:
         """
         if 0 < self.col <= 9:
-            return Player(self.id, self.row, self.col - 1, self.health, self.power,self.gold,self.num_boss_defeated)
-        else:
-            return self
+            self.col -= 1
+        return self
     def move_right(self):
         """
         Move the player right one spot
         :return:
         """
         if 0 <= self.col < 9:
-            return Player(self.id, self.row, self.col + 1, self.health, self.power,self.gold,self.num_boss_defeated)
-        else:
-            return self
+            self.col += 1
+        return self
     def __str__(self, only_id=False):
         """
         :return: string representation of the game object
