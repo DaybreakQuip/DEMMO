@@ -12,6 +12,5 @@ class Player{
     numBossDefeated = numBoss;
   }
   void drawMap(){
-    draw->setCursor(0
   }
 };
