@@ -49,7 +49,9 @@ def handle_post(request):
 
     # Update and store all game objects that have changed
     Serialize.updateGameObjects(changed_game_objects)
-    return "Success"
+    game = Deserialize.createGameFromDatabase()
+    health, power, gold, bosses = game.get_player_stats(player_id)
+    return "{}, {}, {}, {},|{}".format(health, power, gold, bosses, game.get_surrounding_entities(player_id))
 
 def request_handler(request=None):
     method = request.get("method")

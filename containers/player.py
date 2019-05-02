@@ -76,6 +76,13 @@ class Player(GameObject):
         if 0 <= self.col < 9:
             self.col += 1
         return self
+
+    def get_gold(self):
+        return self.gold
+
+    def get_number_of_bosses_defeated(self):
+        return self.num_boss_defeated
+
     def __str__(self, only_id=False):
         """
         :return: string representation of the game object

@@ -197,3 +197,78 @@ class TestAction(unittest.TestCase):
 
         # delete all tables created in this test
         Database.delete_tables(test_database)
+
+class TestGetSurroundings(unittest.TestCase):
+    def setUp(self):
+        Database.delete_tables(test_database)
+    def testGetSurroundingEntities(self):
+        Database.create_game_object_tables(test_database)
+        # Assert there's nothing in them right now
+        self.assertEqual([], Database.get_all_players(test_database))
+        self.assertEqual([], Database.get_all_monsters(test_database))
+
+        # Create players and monsters to serialize
+        players = [
+            Player("One", 3, 0, 1000, 5, 0, 0),
+            Player("OneNeighbor", 4, 0, 100, 5, 0, 0),
+            Player("Two", 1, 9, 1, 999, 1, 100),
+            Player("Three", 0, 5, 1000, 5, 0, 0),
+            Player("Four", 9, 3, 1000, 5, 0, 0),
+            Player("Five", 3, 2, 1000, 5, 0, 0),
+            Player("Six", 1, 7, 1, 999, 1, 100),
+            Player("Seven", 3, 5, 1000, 5, 0, 0),
+            Player("Eight", 5, 3, 1000, 5, 0, 0),
+        ]
+        monsters = [
+            Monster("NotAMonster", 2, 1, 10, 1, False, {}),
+            Monster("NotABoss", 0, 1, 10, 5, True, {"NotZe"}),
+            Monster("OnTopOfEight", 5, 3, 3, 3, True, {"One"})
+        ]
+        new_game = Game(10,10, players, monsters)
+        self.assertEqual("XX,__,M_,XX,_P,__,XX,_P,__,", new_game.get_surrounding_entities("One"))
+        self.assertEqual("__,__,__,__,_P,__,__,__,__,", new_game.get_surrounding_entities("Seven"))
+
+        self.assertEqual("__,__,__,__,MP,__,__,__,__,", new_game.get_surrounding_entities("Eight"))
+        game_objects = players + monsters
+        Serialize.updateGameObjects(game_objects, test_database)
+
+
+        # delete all tables created in this test
+        Database.delete_tables(test_database)
+
+class TestGetPlayerStats(unittest.TestCase):
+    def setUp(self):
+        Database.delete_tables(test_database)
+    def testGetSurroundingEntities(self):
+        Database.create_game_object_tables(test_database)
+        # Assert there's nothing in them right now
+        self.assertEqual([], Database.get_all_players(test_database))
+        self.assertEqual([], Database.get_all_monsters(test_database))
+
+        # Create players and monsters to serialize
+        players = [
+            Player("One", 3, 0, 1000, 5, 0, 0),
+            Player("Two", 1, 9, 1, 999, 1, 100),
+            Player("Three", 0, 5, 50, 50, 50, 50),
+            Player("Four", 9, 3, 1000, 5, 0, 0),
+            Player("Five", 3, 2, 1000, 5, 0, 0),
+            Player("Six", 1, 7, 1, 5, 1, 50),
+            Player("Seven", 3, 5, 1000, 5, 0, 0),
+            Player("Eight", 5, 3, 1000, 5, 0, 0),
+        ]
+        monsters = [
+            Monster("NotAMonster", 2, 1, 10, 1, False, {}),
+            Monster("NotABoss", 0, 1, 10, 5, True, {"NotZe"}),
+        ]
+        new_game = Game(10,10, players, monsters)
+        self.assertEqual((1000,5,0,0),new_game.get_player_stats("One"))
+        self.assertEqual((1,999,1,100), new_game.get_player_stats("Two"))
+        self.assertEqual((50,50,50,50), new_game.get_player_stats("Three"))
+        self.assertEqual((1000, 5, 0, 0), new_game.get_player_stats("Four"))
+        self.assertEqual((1,5,1,50), new_game.get_player_stats("Six"))
+        game_objects = players + monsters
+        Serialize.updateGameObjects(game_objects, test_database)
+
+
+        # delete all tables created in this test
+        Database.delete_tables(test_database)

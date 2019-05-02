@@ -33,6 +33,12 @@ class GameObject():
         """
         return (self.row, self.col)
 
+    def getHealth(self):
+        return self.health
+
+    def getPower(self):
+        return self.power
+
     def updateHealth(self, delta):
         """
         Updates the game object's health by delta

@@ -45,6 +45,8 @@ class Map:
     def get_tile(self, row, col):
         return self.tiles[row][col]
 
+    def is_coordinate_in_range(self, row, col):
+        return 0 <= row <= self.rows-1 and 0<= col <= self.columns-1
 class Tile:
     """
     Class representing a single tile, which can be populated by players and/or monsters
@@ -73,7 +75,12 @@ class Tile:
 
     def remove_monster(self, monster_id):
         self.monsters.remove(monster_id)
-    
+
+    def get_number_of_players(self):
+        return len(self.players)
+    def get_number_of_monsters(self):
+        return len(self.monsters)
+
     def is_empty(self):
         return not(self.players or self.monsters)
 
@@ -151,6 +158,43 @@ class Game:
         row, col = monster.getLocation()
         tile = self.map.get_tile(row, col)
         tile.add_monster(monster_id)
+
+    def get_surrounding_entities(self, player_id):
+        """
+        Gets the surrounding entities of the player, if any
+        :param player_id: player to locate
+        :return: a 3x3 String display of tiles around the player (including the tile the player is on)
+        """
+        player = self.id_to_players[player_id]
+        player_row_coord, player_col_coord = player.getLocation()
+        entities = ""
+        for row in range(-1,2):
+            for col in range(-1,2):
+                neighbor_row = player_row_coord + row
+                neighbor_col = player_col_coord + col
+                if self.map.is_coordinate_in_range(neighbor_row, neighbor_col):
+                    tile = self.map.get_tile(neighbor_row,neighbor_col)
+                    if tile.get_number_of_players() > 0 and tile.get_number_of_monsters() > 0:
+                        entities += "MP,"
+                    elif tile.get_number_of_monsters() > 0:
+                        entities += "M_,"
+                    elif tile.get_number_of_players() > 0:
+                        entities += "_P,"
+                    else:
+                        entities += "__,"
+                else:
+                    entities += "XX,"
+        return entities
+
+    def get_player_stats(self, player_id):
+        """
+        Gets the statistics of a selected player
+        :param player_id: player to locate
+        :return: stats of the player, including their health, power, gold, and number of bosses defeated
+        """
+        player = self.id_to_players[player_id]
+        return player.getHealth(), player.getPower(), player.get_gold(), player.get_number_of_bosses_defeated()
+
 
     def execute(self, player_id, action):
         """
