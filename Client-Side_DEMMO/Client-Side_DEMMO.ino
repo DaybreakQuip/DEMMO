@@ -15,9 +15,9 @@ int state = 0;
 MPU9255 imu; //imu object called, appropriately, imu
 #define MOVE 0 //state of player's action
 #define FIGHT 1 //state of player's action
-int flag = 0;
-
-Player ze(&tft, 11, 5, 3, 10);
+unsigned long timer;
+int randNumber;
+Player me(&tft);
 
 void setup() {
   Serial.begin(115200); //for debugging if needed.
@@ -54,42 +54,55 @@ void setup() {
     Serial.println(WiFi.status());
     ESP.restart(); // restart the ESP (proper way)
   }
-
+  randomSeed(analogRead(0));
+  String server_response = post_request(" ");
+  int token_index = server_response.indexOf('|');
+  String player_stats = server_response.substring(0, token_index);
+  String test_map = server_response.substring(token_index + 1);
+  randNumber = random(0, 11);
+  me.drawMap(test_map);
+  me.drawStats(player_stats);
+  me.drawFlavorText(randNumber);
+  timer = millis();
 }
 
 void loop() {
-    action();
-    delay(1000);
-    if (flag == 0) {
-      // change server_response when implemented
-      String server_response = "11, 5, 3, 10,|M_,__,__,__,_P,__,__,M_,__,";
-      // String test_map = "M_,__,__,__,_P,__,__,M_,__,";
-      int token_index = server_response.indexOf('|');
-      String player_stats = server_response.substring(0, token_index);
-      String test_map = server_response.substring(token_index + 1);
-      String story = "Once upon a time, Ze was thrown into a dungeon";
-      ze.drawMap(test_map, story);
-      flag = 1;
+    if (millis() - timer > 1500) {
+      String server_response = action();
+      if (server_response.length() > 0){
+          int token_index = server_response.indexOf('|');
+          String player_stats = server_response.substring(0, token_index);
+          String test_map = server_response.substring(token_index + 1);
+          randNumber = random(0, 11);
+          timer = millis();
+          me.drawMap(test_map);
+          me.drawStats(player_stats);
+          me.drawFlavorText(randNumber);
+      }
     }
 }
 
-void action(){
+String action(){
   switch(state){
     case MOVE:
       int LR = analogRead(ILR);
       int UD = analogRead(IUD);
+      Serial.println(LR);
       if (LR >= 3000){
-        post_request("right");
+        return post_request("right");
       }
       else if (LR < 1000){
-        post_request("left");
+       return post_request("left");
 
       }
       else if (UD >= 3000){
-        post_request("down");
+       return post_request("down");
       }
       else if (UD < 1000){
-        post_request("up");
+       return post_request("up");
+      }
+      else{
+        return "";
       }
       break;
     }
