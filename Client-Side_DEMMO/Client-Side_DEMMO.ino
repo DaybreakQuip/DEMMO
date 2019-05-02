@@ -4,6 +4,7 @@
 #include <string.h>  //used for some string handling and processing.
 #include <mpu9255_esp32.h>
 #include <HTTPClient.h>
+#include Player.cpp
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 char network[] = "MIT";  //SSID for 6.08 Lab
 String player = "Ze";
