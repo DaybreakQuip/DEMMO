@@ -1,13 +1,15 @@
 #include <TFT_eSPI.h> // Graphics and font library for ST7735 driver chip
 #include <SPI.h> //Used in support of TFT Display
 #include <string.h>  //used for some string handling and processing.
+#include <string>
+using namespace std;
 class Player{
   public:
   int health = 5;
   int power = 5;
   int gold = 5;
   int numBossDefeated = 0;
-   String explorationText[11] = {"You sit down to take a break.", "You feel as if something is watching you.",
+   string explorationText[11] = {"You sit down to take a break.", "You feel as if something is watching you.",
       "It is currently daytime. No maybe night. You are not sure.", "You ate food that you found in the dungeon. It was gross.", "You thought you found treasure. It was monster remains.", 
       "You fall asleep on the cold hard floor due to exhaustion.", "You thought you heard a monster. It was your stomach.", "A voice whispers: Give up.",
       "You found a dead body along your path.", "You try to dig through the dungeon with your weapon. It didn't work.", "You got up and tripped over yourself."};
@@ -15,7 +17,7 @@ class Player{
   Player(TFT_eSPI* tft_to_use){
     draw = tft_to_use;
   }
-  void drawMap(String player_map){
+  void drawMap(string player_map){
     const uint16_t BACKGROUND_COLOR = TFT_BLACK;
     const uint16_t MAP_OUTLINE_COLOR = TFT_WHITE;
     const uint16_t PLAYER_COLOR = TFT_GREEN;
@@ -30,49 +32,51 @@ class Player{
 
         // draw monster
         int start = (j*3 + i)*3;
-        if (player_map.charAt(start) == 'M') {
+        if (player_map.at(start) == 'M') {
           draw->fillRect(i*SQUARE_SIZE + 1, j*SQUARE_SIZE + 1, SQUARE_SIZE - 2, SQUARE_SIZE - 2, MONSTER_COLOR);
         }
 
         // draw player
-        if (player_map.charAt(start + 1) == 'P') {
+        if (player_map.at(start + 1) == 'P') {
           draw->fillCircle(i*SQUARE_SIZE + SQUARE_SIZE/2, j*SQUARE_SIZE + SQUARE_SIZE/2, 2, PLAYER_COLOR);
         }
 
-        if (player_map.charAt(start) == 'X'){
+        if (player_map.at(start) == 'X'){
           draw->fillRect(i*SQUARE_SIZE + 1, j*SQUARE_SIZE + 1, SQUARE_SIZE - 2, SQUARE_SIZE - 2, TFT_YELLOW);
         }
       }
     }
   }
 
-  void drawStats(String playerStats){
+  void drawStats(string playerStats){
     // draw player stats
-    int token_index = playerStats.indexOf(',');
-    health = playerStats.substring(0, token_index).toInt();
-    playerStats = playerStats.substring(token_index+1);
-    token_index = playerStats.indexOf(',');
-    power = playerStats.substring(0, token_index).toInt();
-    playerStats = playerStats.substring(token_index+1);
-    token_index = playerStats.indexOf(',');
-    gold = playerStats.substring(0, token_index).toInt();
-    playerStats = playerStats.substring(token_index+1);
-    token_index = playerStats.indexOf(',');
-    numBossDefeated = playerStats.substring(0, token_index).toInt();
+    int token_index = playerStats.find(',');
+    health = atoi(playerStats.substr(0, token_index).c_str());
+    playerStats = playerStats.substr(token_index+1);
+    token_index = playerStats.find(',');
+    power = atoi(playerStats.substr(0, token_index).c_str());
+    playerStats = playerStats.substr(token_index+1);
+    token_index = playerStats.find(',');
+    gold = atoi(playerStats.substr(0, token_index).c_str());
+    playerStats = playerStats.substr(token_index+1);
+    token_index = playerStats.find(',');
+    numBossDefeated = atoi(playerStats.substr(0, token_index).c_str());
     const int SQUARE_SIZE = 15;
     const int text_x = 3*SQUARE_SIZE + 10;
+    char buffer[20];
     for (int i = 0; i < 5; i++) {
       draw->setCursor(text_x, i*10);
       if (i == 0) {
         draw->println("   Stats   ");
       } else if (i == 1) {
-        draw->println("HP:   " + String(health));
+        draw->printf("HP:   %d", health);
       } else if (i == 2) {
-        draw->println("PWR:  " + String(power));
+  
+        draw->printf("PWR:  %d", power);
       } else if (i == 3) {
-        draw->println("Gold: " + String(gold));
+        draw->printf("Gold: %d", gold);
       } else if (i == 4) {
-        draw->println("Boss: " + String(numBossDefeated));
+        draw->printf("Boss: %d", numBossDefeated);
       } 
     }
   }
@@ -92,9 +96,9 @@ class Player{
       //draw->println(">");
   
       // draw flavor text
-      String flavor_text = explorationText[randomIndex];
+      string flavor_text = explorationText[randomIndex];
       const int flavor_y = options_y + 30;
       draw->setCursor(0, flavor_y);
-      draw->println(flavor_text);
+      draw->println(flavor_text.c_str());
    }
 };

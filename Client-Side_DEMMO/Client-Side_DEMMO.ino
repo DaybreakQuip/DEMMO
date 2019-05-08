@@ -4,10 +4,12 @@
 #include <string.h>  //used for some string handling and processing.
 #include <mpu9255_esp32.h>
 #include <HTTPClient.h>
+#include <string>
+using std::string;
 #include "Player.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 char network[] = "MIT";  //SSID for 6.08 Lab
-String player = "Ze";
+string player = "Ze";
 //char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
 const uint8_t IUD = 32; //pin connected to button 
 const uint8_t ILR = 33; //pin connected to button 
@@ -37,7 +39,7 @@ void setup() {
   }
   WiFi.begin(network);
   uint8_t count = 0; //count used for Wifi check times
-  Serial.print("AtUDting to connect to ");
+  Serial.print("Attempting to connect to ");
   Serial.println(network);
   while (WiFi.status() != WL_CONNECTED && count<12) {
     delay(500);
@@ -55,10 +57,10 @@ void setup() {
     ESP.restart(); // restart the ESP (proper way)
   }
   randomSeed(analogRead(0));
-  String server_response = post_request(" ");
-  int token_index = server_response.indexOf('|');
-  String player_stats = server_response.substring(0, token_index);
-  String test_map = server_response.substring(token_index + 1);
+  string server_response = post_request(" ");
+  int token_index = server_response.find('|');
+  string player_stats = server_response.substr(0, token_index);
+  string test_map = server_response.substr(token_index + 1);
   randNumber = random(0, 11);
   me.drawMap(test_map);
   me.drawStats(player_stats);
@@ -68,11 +70,11 @@ void setup() {
 
 void loop() {
     if (millis() - timer > 1500) {
-      String server_response = action();
+      string server_response = action();
       if (server_response.length() > 0){
-          int token_index = server_response.indexOf('|');
-          String player_stats = server_response.substring(0, token_index);
-          String test_map = server_response.substring(token_index + 1);
+          int token_index = server_response.find('|');
+          string player_stats = server_response.substr(0, token_index);
+          string test_map = server_response.substr(token_index + 1);
           randNumber = random(0, 11);
           timer = millis();
           me.drawMap(test_map);
@@ -82,7 +84,7 @@ void loop() {
     }
 }
 
-String action(){
+string action(){
   switch(state){
     case MOVE:
       int LR = analogRead(ILR);
@@ -107,17 +109,36 @@ String action(){
       break;
     }
 }
-String post_request(String action){
-  HTTPClient http;
-  http.begin("http://608dev.net/sandbox/sc/zehang/DEMMO/request_handler.py");
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded"); 
-  int httpResponseCode = http.POST("player_id=" + player + "&action=" + action);
-  if(httpResponseCode>0){
-    String response = http.getString();
-    return response;
+string post_request(string action){
+  //Note to self, to convert integer to string: string boss = "Boss: " + string(itoa(numBossDefeated, buffer, 10));
+  WiFiClient client;
+  string body = "player_id=" + player + "&action=" + action;
+  if (client.connect("608dev.net", 80)) {
+    client.println("POST http://608dev.net/sandbox/sc/zehang/DEMMO/request_handler.py HTTP/1.1");
+    client.println("Host: 608dev.net");
+    client.println("Content-Type: application/x-www-form-urlencoded");
+    client.print("Content-Length: ");
+    client.println(body.length());
+    client.println();
+    client.println(body.c_str());
+    //Serial.println(body.c_str());
+
   }
-  else{
-    return "Error on sending POST: ";
-  }
-  http.end();
+  string buff = "";
+  buff = "  ";
+  string response = "";
+  bool canRespond = false;
+  while(!client.available()){}
+   while ( client.available())
+    {
+      char resp = client.read();
+      buff += resp;
+      if (canRespond){
+        response += resp;
+      }
+      if (buff.substr(buff.length()-2, buff.length()) == "\n\r"){
+        canRespond = true;
+      }
+    }
+  return response.substr(1, response.length());
 }
