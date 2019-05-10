@@ -95,7 +95,9 @@ class Game:
         player = self.id_to_players[player_id]
 
         changed_objects = []
-        if action == constants.Game.DOWN:
+        if action == constants.Game.START:
+            pass
+        elif action == constants.Game.DOWN:
             # Move down
             changed_objects.append(player.move_down())
         elif action == constants.Game.UP:
