@@ -18,6 +18,7 @@ class Fight{
   Monster *monster;
   TFT_eSPI *draw;
   int fightState;
+  float critMultiplier = 0.5;
     
   public:
   Fight(Player* player, Monster* monster, TFT_eSPI* tft_to_use){
@@ -30,6 +31,11 @@ class Fight{
   int getFightState() { return fightState; }
 
   void setFightState(int fightState) { this->fightState = fightState; }
+
+  int randomizeAttack(int attack) {
+    int randomNum = random(80, 120);
+    return int(attack * (randomNum / 10.0));
+  }
 
   boolean startFight(Monster* monster) {
     this->monster = monster;
@@ -45,6 +51,16 @@ class Fight{
             // <player attacks on button press>
             // <insert button logic here>
             int playerAttack = 100; // test damage
+            int randNumber = random(100);
+            if (randNumber < player->getLuck()) {
+              playerAttack = ((1 + critMultiplier) * player->getPower());
+            } else {
+              playerAttack = player->getPower();
+            }
+            playerAttack = randomizeAttack(playerAttack);
+            Serial.print("Player attack: ");
+            Serial.println(playerAttack);
+            
             monster->setHealth(monster->getHealth() - playerAttack);
             fightState = MONSTER_TURN;
           } else { // player is dead
@@ -56,7 +72,11 @@ class Fight{
         {
           if (monster->getHealth() > 0) { // monster is alive
             // monster responds automatically if alive
-            int monsterAttack = 100; // test damage
+            int monsterAttack = monster->getPower(); // test damage
+            monsterAttack = randomizeAttack(monsterAttack);
+            Serial.print("Monster attack: ");
+            Serial.println(monsterAttack);
+            
             player->setHealth(player->getHealth() - monsterAttack);
             fightState = PLAYER_TURN;
           } else { // monster is dead

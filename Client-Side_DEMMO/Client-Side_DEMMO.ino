@@ -85,6 +85,8 @@ void loop() {
           buttonTimer = millis();
       }
       string server_response = action();
+      Serial.print("server response: ");
+      Serial.println(server_response.c_str());
       if (server_response.length() > 0){
           int token_index = server_response.find('|');
           string player_stats = server_response.substr(0, token_index);
@@ -95,7 +97,7 @@ void loop() {
           me.drawStats(player_stats);
           me.drawFlavorText(randNumber);
     }
-}
+} 
 
 string action(){
   switch(state){
@@ -133,7 +135,7 @@ string action(){
             Monster monster(5,10); // dummy monster
             Fight fight(&me, &monster, &tft); // dummy fight
             boolean playerWins = fight.startFight(&monster);
-            string action = "fight&health=" + me.getHealth();
+            string action = "fight_result&health=" + me.getHealth();
             if (playerWins) {
               // go to some state
             } else {
@@ -164,7 +166,7 @@ string post_request(string player, string action){
   WiFiClient client;
   string body = "player_id=" + player + "&action=" + action;
   if (client.connect("608dev.net", 80)) {
-    client.println("POST http://608dev.net/sandbox/sc/zehang/DEMMO/request_handler.py HTTP/1.1");
+    client.println("POST http://608dev.net/sandbox/sc/yanniw/DEMMO/request_handler.py HTTP/1.1");
     client.println("Host: 608dev.net");
     client.println("Content-Type: application/x-www-form-urlencoded");
     client.print("Content-Length: ");
