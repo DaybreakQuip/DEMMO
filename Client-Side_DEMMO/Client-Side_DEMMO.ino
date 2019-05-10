@@ -80,7 +80,7 @@ void setup() {
 }
 
 void loop() {
-      if (digitalRead(BUTTON_2) && (millis() - buttonTimer > 500) && state == MOVE){
+      if (digitalRead(BUTTON_2)==0 && (millis() - buttonTimer > 500) && state == MOVE){
           state = QUIT;
           buttonTimer = millis();
       }
@@ -90,7 +90,13 @@ void loop() {
       if (server_response.length() > 0){
           int token_index = server_response.find('|');
           string player_stats = server_response.substr(0, token_index);
-          string test_map = server_response.substr(token_index + 1);
+          
+          string remaining_info = server_response.substr(token_index+1);
+          token_index = remaining_info.find(',');
+          
+          string test_map = remaining_info.substr(token_index + 1);
+          string monster_info = remaining_info.substr(token_index+1);
+         
           randNumber = random(0, 11);
           moveTimer = millis();
           me.drawMap(test_map);
@@ -100,15 +106,19 @@ void loop() {
 } 
 
 string action(){
+  Serial.print("state: ");
+  Serial.println(state);
   switch(state){
     case START:
       tft.drawString("Welcome to the Game! Press button to continue.", 0, 0, 1);
-      if (digitalRead(BUTTON_1) && (millis() - buttonTimer > 500)){
+      if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
+          Serial.println("Button has been pressed, starting the game!");
           state = MOVE;
           return post_request(me.getPlayerName(), " ");
       }
       return "";
     case MOVE:
+        Serial.println("Trying to move!");
         if (millis() - moveTimer > 1500) {
           int LR = analogRead(ILR);
           int UD = analogRead(IUD);
@@ -126,9 +136,11 @@ string action(){
           else if (UD < 1000){
            return post_request(me.getPlayerName(),"up");
           }
-          else{
+          else {
             return "";
           }
+       } else {
+          return "";
        }
      case FIGHT:
           {
