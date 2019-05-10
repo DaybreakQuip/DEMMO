@@ -137,16 +137,27 @@ class Fight{
     draw->setCursor(25, 110);
     draw->printf("Monster HP: %d", monster->getHealth());
   }
-
+  void drawPlayerDamage(int playerAttack){
+    draw->setCursor(5, 10);
+    draw->println("                     ");
+    draw->setCursor(5, 10);
+    draw->printf("You dealt %d dmg", playerAttack);
+  }
+  void drawMonsterDamage(int monsterAttack){
+    draw->setCursor(5, 10);
+    draw->println("                     ");
+    draw->setCursor(5, 10);
+    draw->printf("Enemy dealt %d dmg", monsterAttack);
+  }
   boolean startFight(Monster* monster) {
     draw->fillScreen(TFT_BLACK);
     draw->fillRect(5, 50, 20, 40, TFT_BLUE);
     draw->fillRect(100, 50, 20, 40,TFT_RED);
     draw->fillCircle(20, 54, 1, TFT_WHITE);
     draw->fillCircle(103, 54, 1, TFT_PURPLE);
-    draw->setCursor(0,130);
+    draw->setCursor(0,140);
     draw->println("1: Attack");
-    draw->println("2: Forefeit");
+    draw->println("2: Forfeit");
     drawHP();
     while (fightState != FIGHT_END) {
       switch (fightState) {
@@ -177,6 +188,7 @@ class Fight{
                 monster->setHealth(monster->getHealth() - playerAttack);
                 fightState = MONSTER_TURN;
                 drawHP();
+                drawPlayerDamage(playerAttack);
               }
             } else { // player is dead
               drawPlayerDeath();
@@ -194,6 +206,7 @@ class Fight{
               fightState = PLAYER_TURN;
               drawMonsterAttack();
               drawHP();
+              drawMonsterDamage(monsterAttack);
             } else { // monster is dead
               fightState = FIGHT_END; 
               drawMonsterDeath();
