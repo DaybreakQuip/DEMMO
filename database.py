@@ -41,8 +41,6 @@ class Database:
 			'''CREATE TABLE IF NOT EXISTS player_table (id text, row int, col int, health int, power int, luck int, gold int, num_bosses_defeated int);''')  # run a CREATE TABLE command
 		c.execute(
 			'''CREATE TABLE IF NOT EXISTS monster_table (id text, row int, col int, health int, power int, is_boss text, defeated_by text);''')  # run a CREATE TABLE command
-		c.execute(
-			'''CREATE TABLE IF NOT EXISTS record_table (id text, num_bosses_defeated int);''')  # run a CREATE TABLE command
 		conn.commit()  # commit commands
 		conn.close()  # close connection to database
 
@@ -66,12 +64,6 @@ class Database:
 		player_exists = c.execute(
 			'''SELECT EXISTS(SELECT 1 FROM player_table WHERE id = ?);''', (id, )).fetchone()[0]
 		if not player_exists: # Create a new player entry if the player does not exist
-			# First see if the player exists in the record_table, if they do, use the num_bosses_defeated value from there
-			record_exists = c.execute(
-				'''SELECT EXISTS(SELECT 1 FROM record_table WHERE id = ?);''', (id,)).fetchone()[0]
-			if record_exists:
-				num_bosses_defeated = c.execute('''SELECT num_bosses_defeated FROM record_table WHERE id = ?;''',(id,)).fetchone()
-
 			c.execute(
 				'''INSERT into player_table VALUES(?, ?, ?, ?, ?, ?, ?, ?);''',
 				(id, row, col, health, power, luck, gold, num_bosses_defeated))
@@ -110,37 +102,6 @@ class Database:
 			c.execute(
 				'''UPDATE monster_table SET row = ?, col = ?, health = ?, power = ?, is_boss = ?, defeated_by = ? WHERE id = ?;''',
 				(row, col, health, power, is_boss, defeated_by, id))
-
-		conn.commit()  # commit commands
-		conn.close()  # close connection to database
-
-	@classmethod
-	def create_or_update_record(cls, id, num_bosses_defeated,
-								database=db_constants.DATABASE_PATH):
-		"""
-        Updates a record entry in the record_table if the record exists or creates a new entry otherwise
-        :param id: (string) id of the player we want to update or create the record of
-        :param num_bosses_defeated: (int) player's number of bosses defeated
-        :return: None
-        """
-		conn = sqlite3.connect(database)  # connect to that database (will create if it doesn't already exist)
-		c = conn.cursor()  # make cursor into database (allows us to execute commands)
-
-		# Determine whether the record exists in the database
-		record_exists = c.execute(
-			'''SELECT EXISTS(SELECT 1 FROM record_table WHERE id = ?);''', (id,)).fetchone()[0]
-		if not record_exists:  # Create a new record entry if the record does not exist
-			# First see if the record exists in the record_table, if they do, use the num_bosses_defeated value from there
-			record_exists = c.execute(
-				'''SELECT EXISTS(SELECT 1 FROM record_table WHERE id = ?);''', (id,)).fetchone()[0]
-
-			c.execute(
-				'''INSERT into record_table VALUES(?, ?);''',
-				(id, num_bosses_defeated))
-		else:  # Update the existing record if the record exists
-			c.execute(
-				'''UPDATE record_table SET num_bosses_defeated = ? WHERE id = ?;''',
-				(num_bosses_defeated, id))
 
 		conn.commit()  # commit commands
 		conn.close()  # close connection to database
@@ -250,10 +211,6 @@ class Database:
 		"""
 		conn = sqlite3.connect(database)  # connect to that database (will create if it doesn't already exist)
 		c = conn.cursor()  # make cursor into database (allows us to execute commands)
-		# First same the player's progress
-		num_bosses_defeated = c.execute('''SELECT num_bosses_defeated FROM player_table WHERE id = ?;''',(player_id,)).fetchone()
-		cls.create_or_update_record(player_id, num_bosses_defeated, database)
-
 		# Delete player from player table with given id
 		c.execute('''DELETE FROM player_table WHERE id = ?;''',(player_id,))
 		conn.commit()  # commit commands
