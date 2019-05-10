@@ -40,7 +40,10 @@ class Fight{
       case PLAYER_TURN:
         {
           if (player->getHealth() > 0) { // player is alive
-            // player attacks
+            // <player attacks on button press>
+            // <insert button logic here>
+            int playerAttack = 100; // test damage
+            monster->setHealth(monster->getHealth() - playerAttack);
             fightState = MONSTER_TURN;
           } else { // player is dead
             fightState = FIGHT_END;
@@ -50,7 +53,9 @@ class Fight{
       case MONSTER_TURN:
         {
           if (monster->getHealth() > 0) { // monster is alive
-            // monster attacks
+            // monster responds automatically if alive
+            int monsterAttack = 100; // test damage
+            player->setHealth(player->getHealth() - monsterAttack);
             fightState = PLAYER_TURN;
           } else { // monster is dead
             fightState = FIGHT_END; 
@@ -60,8 +65,6 @@ class Fight{
       case FIGHT_END:
         {
           fightState = IDLE;
-          //string action = "fight&health=" + player.getHealth();
-          //post_request(player.getPlayerName(), action);
           // return true if player wins, false otherwise
           return player->getHealth() > 0;
           break;
