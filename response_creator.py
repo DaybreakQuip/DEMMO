@@ -40,13 +40,25 @@ class ResponseCreator:
         """
         Returns the response for an action done by the player
         :param player_id: the player's id
+        :param action: the action done by the player
         :return: string with format player_info|map_info|monster_info
         """
-        player_info = self.get_player_info_for_response(player_id)
-        map_info = self.get_surrounding_entities(player_id)
-        monster_info = self.get_monster_info_for_response(player_id)
+        if self.game.has_player(player_id):
+            player_info = self.get_player_info_for_response(player_id)
+            map_info = self.get_surrounding_entities(player_id)
+            monster_info = self.get_monster_info_for_response(player_id)
 
-        return "{}|{}|{}".format(player_info, map_info, monster_info)
+            return "{}|{}|{}".format(player_info, map_info, monster_info)
+        # if the player is not in the game
+        return "Player id not found"
+
+    def get_action_response_without_monster_info(self, player_id):
+        if self.game.has_player(player_id):
+            player_info = self.get_player_info_for_response(player_id)
+            map_info = self.get_surrounding_entities(player_id)
+
+            return "{}|{}|F".format(player_info, map_info)
+        return "Player id not found"
 
     def get_surrounding_entities(self, player_id):
         """

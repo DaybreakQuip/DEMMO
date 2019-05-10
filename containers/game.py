@@ -75,6 +75,14 @@ class Game:
         monster = self.id_to_monsters[monster_id]
         return monster.get_monster_stats()
 
+    def has_player(self, player_id):
+        """
+        Returns whether the game has a specific player_id
+        :param player_id: the player's id
+        :return: True if the game has the player and False otherwise
+        """
+        return player_id in self.id_to_players
+
     def execute(self, **kwargs):
         """
         Executes a player action
@@ -143,14 +151,6 @@ class Game:
             else:
                 return None
         return None
-
-    def defeat_monster(self, player_id):
-        """
-        Update the game given that the player has defeated the monster in the player's location
-        :param player_id:
-        :return: monster information that changed
-        """
-        pass
 
     def get_server_map(self):
         return ResponseCreator(self).get_server_map()
