@@ -1,6 +1,7 @@
 import sys
 sys.path.append('__HOME__/DEMMO')
 
+import constants
 from database import Database, Serialize, Deserialize
 from containers.player import Player
 from containers.monster import Monster
@@ -34,6 +35,7 @@ def handle_post(request):
     # Get arguments from the request
     form = request.get('form', {})
     player_id = form['player_id']
+    action = form['action']
 
     changed_game_objects = [] # list of game objects that have changed
 
@@ -53,7 +55,10 @@ def handle_post(request):
     game = Deserialize.createGameFromDatabase()
 
     # Get and return the response for an action
-    return ResponseCreator(game).get_action_response(player_id)
+    if action == constants.Game.FIGHT_RESULT:
+        return ResponseCreator(game).get_action_response_without_monster_info(player_id)
+    else:
+        return ResponseCreator(game).get_action_response(player_id)
 
 def request_handler(request=None):
     method = request.get("method")
