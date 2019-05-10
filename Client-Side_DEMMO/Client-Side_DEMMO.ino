@@ -168,8 +168,9 @@ string action(){
             }
             char buffer[20];
             string action = "fight_result&health=" + string(itoa(me.getHealth(), buffer, 10));
+            Serial.println(action.c_str());
+            string server_response = post_request(me.getPlayerName(), action);
             if (playerWins) {
-                string server_response = post_request(me.getPlayerName(), action);
                 int token_index = server_response.find('|');
                 string player_stats = server_response.substr(0, token_index);
                 string test_map = server_response.substr(token_index + 1);
