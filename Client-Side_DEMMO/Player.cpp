@@ -77,6 +77,7 @@ class Player{
     const uint16_t MAP_OUTLINE_COLOR = TFT_WHITE;
     const uint16_t PLAYER_COLOR = TFT_GREEN;
     const uint16_t MONSTER_COLOR = TFT_RED;
+    const uint16_t BOSS_COLOR = TFT_ORANGE;
     const int SQUARE_SIZE = 15;
     draw->fillScreen(BACKGROUND_COLOR);
 
@@ -89,6 +90,10 @@ class Player{
         int start = (j*3 + i)*3;
         if (player_map.at(start) == 'M') {
           draw->fillRect(i*SQUARE_SIZE + 1, j*SQUARE_SIZE + 1, SQUARE_SIZE - 2, SQUARE_SIZE - 2, MONSTER_COLOR);
+        }
+
+        if (player_map.at(start) == 'B') {
+          draw->fillRect(i*SQUARE_SIZE + 1, j*SQUARE_SIZE + 1, SQUARE_SIZE - 2, SQUARE_SIZE - 2, BOSS_COLOR);
         }
 
         // draw player
@@ -122,7 +127,7 @@ class Player{
     const int SQUARE_SIZE = 15;
     const int text_x = 3*SQUARE_SIZE + 10;
     char buffer[20];
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
       draw->setCursor(text_x, i*10);
       if (i == 0) {
         draw->println("   Stats   ");
@@ -131,8 +136,10 @@ class Player{
       } else if (i == 2) {
         draw->printf("PWR:  %d", power);
       } else if (i == 3) {
-        draw->printf("Gold: %d", gold);
+        draw->printf("Luck: %d", luck);
       } else if (i == 4) {
+        draw->printf("Gold: %d", gold);
+      } else if (i == 5) {
         draw->printf("Boss: %d", numBossDefeated);
       } 
     }
