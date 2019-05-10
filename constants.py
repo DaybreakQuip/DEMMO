@@ -56,6 +56,8 @@ class Game:
     UP          = "up"
     LEFT        = "left"
     RIGHT       = "right"
+    FIGHT_RESULT = "fight_result"
+
     class ServerMap:
         DIVIDER_MULTIPLIER = 4 # Determines size of the divider -> larger number = longer divider
         TILE_SIZE = 3 # size of each tile on the map

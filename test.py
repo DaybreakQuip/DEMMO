@@ -177,14 +177,14 @@ class TestAction(unittest.TestCase):
         ]
         new_game = Game(10,10, players, monsters)
         game_objects = []
-        game_objects.extend(new_game.execute("MoveLeftWall", "left"))
-        game_objects.extend(new_game.execute("MoveRightWall", "right"))
-        game_objects.extend(new_game.execute("MoveUpWall", "up"))
-        game_objects.extend(new_game.execute("MoveDownWall", "down"))
-        game_objects.extend(new_game.execute("MoveLeft", "left"))
-        game_objects.extend(new_game.execute("MoveRight", "right"))
-        game_objects.extend(new_game.execute("MoveUp", "up"))
-        game_objects.extend(new_game.execute("MoveDown", "down"))
+        game_objects.extend(new_game.execute(player_id="MoveLeftWall", action="left"))
+        game_objects.extend(new_game.execute(player_id="MoveRightWall", action="right"))
+        game_objects.extend(new_game.execute(player_id="MoveUpWall", action="up"))
+        game_objects.extend(new_game.execute(player_id="MoveDownWall", action="down"))
+        game_objects.extend(new_game.execute(player_id="MoveLeft", action="left"))
+        game_objects.extend(new_game.execute(player_id="MoveRight", action="right"))
+        game_objects.extend(new_game.execute(player_id="MoveUp", action="up"))
+        game_objects.extend(new_game.execute(player_id="MoveDown", action="down"))
         game_objects = game_objects + monsters
         # Serialize and check if database is updated
         Serialize.updateGameObjects(game_objects, test_database)

@@ -34,7 +34,6 @@ def handle_post(request):
     # Get arguments from the request
     form = request.get('form', {})
     player_id = form['player_id']
-    action = form['action']
 
     changed_game_objects = [] # list of game objects that have changed
 
@@ -47,7 +46,7 @@ def handle_post(request):
         changed_game_objects.append(player)
 
     # Execute the player's action and keep track of game objects that changed
-    changed_game_objects.extend(game.execute(player_id, action))
+    changed_game_objects.extend(game.execute(form))
 
     # Update and store all game objects that have changed
     Serialize.updateGameObjects(changed_game_objects)
