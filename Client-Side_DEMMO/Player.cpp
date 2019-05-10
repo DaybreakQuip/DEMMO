@@ -148,7 +148,7 @@ class Player{
   void drawFlavorText(int randomIndex){
       // draw player options
       const int SQUARE_SIZE = 15;
-      const int options_y = 3*SQUARE_SIZE + 10;
+      const int options_y = 3*SQUARE_SIZE + 20;
       const uint16_t OPTIONS_COLOR = TFT_YELLOW;
       draw->drawRect(10, options_y, 105, 20, OPTIONS_COLOR);
       draw->setCursor(30, options_y + 6);

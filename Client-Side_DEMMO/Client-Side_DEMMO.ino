@@ -28,6 +28,7 @@ unsigned long moveTimer;
 int randNumber;
 unsigned long buttonTimer; //timer to make sure multiple button presses do not occur
 Player me(&tft, player);
+Monster monster(5,10); // dummy monster
 
 void setup() {
   Serial.begin(115200); //for debugging if needed.
@@ -95,17 +96,18 @@ void loop() {
           string remaining_info = server_response.substr(token_index+1);
           token_index = remaining_info.find('|');
           
-          string test_map = remaining_info.substr(0, token_index + 1);
-          //string monster_info = remaining_info.substr(token_index+1);
+          string test_map = remaining_info.substr(0, token_index);
+          string monster_info = remaining_info.substr(token_index+1);
 
-          //if (monster_info.at(0) == 'T') {
-            //Serial.println("monster here");
-          //} else {
-            //Serial.println("monster already killed");
-          //}
-
-          Serial.print("monster info");
-          //Serial.println(monster_info.c_str());
+          if (monster_info.at(0) == 'T') {
+            state = FIGHT;
+            token_index = monster_info.find(',');
+            monster.setHealth(atoi(monster_info.substr(2,token_index).c_str()));
+            remaining_info = monster_info.substr(token_index+1);
+            monster.setPower(atoi(remaining_info.c_str()));
+          } else {
+            Serial.println("no monster");
+          }
           
           randNumber = random(0, 11);
           moveTimer = millis();
@@ -154,14 +156,15 @@ string action(){
        }
      case FIGHT:
           {
-            Monster monster(5,10); // dummy monster
             Fight fight(&me, &monster, &tft); // dummy fight
             boolean playerWins = fight.startFight(&monster);
+            Serial.print("player wins the fight? ");
+            Serial.println(playerWins);
             string action = "fight_result&health=" + me.getHealth();
             if (playerWins) {
-              // go to some state
+              state = MOVE;
             } else {
-              // go to state that wipes player
+              state = END;
             }
             return post_request(me.getPlayerName(), action);
           }

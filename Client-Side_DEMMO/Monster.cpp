@@ -9,18 +9,21 @@ class Monster{
   int health;
   int power;
   public:
-  Monster(int health, int power){
+  Monster(int health, int power) {
     this->health = health;
     this->power = power;
   }
   int getHealth(){
     return health;
   }
-  int setHealth(int health){
+  void setHealth(int health) {
     this->health = health;
   }
   int getPower(){
     return power;
+  }
+  void setPower(int power) {
+    this->power = power;
   }
 };
 #endif
