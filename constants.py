@@ -52,6 +52,7 @@ class Database:
 
 # Game constants
 class Game:
+    START       = "start"
     DOWN        = "down"
     UP          = "up"
     LEFT        = "left"
