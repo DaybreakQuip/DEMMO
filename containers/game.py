@@ -110,7 +110,7 @@ class Game:
             # Move right
             changed_objects.append(player.move_right())
         elif action == constants.Game.FIGHT_RESULT:
-            health = kwargs['health']
+            health = int(kwargs['health'])
             changed_objects.extend(self.process_fight_result(player, health))
 
         return changed_objects

@@ -33,9 +33,9 @@ def handle_post(request):
     :return: response based on request
     """
     # Get arguments from the request
-    form = request.get('form', {})
-    player_id = form['player_id']
-    action = form['action']
+    action_info = request.get('form', {})
+    player_id = action_info['player_id']
+    action = action_info['action']
 
     changed_game_objects = [] # list of game objects that have changed
 
@@ -48,7 +48,7 @@ def handle_post(request):
         changed_game_objects.append(player)
 
     # Execute the player's action and keep track of game objects that changed
-    changed_game_objects.extend(game.execute(form))
+    changed_game_objects.extend(game.execute(**action_info))
 
     # Update and store all game objects that have changed
     Serialize.updateGameObjects(changed_game_objects)
