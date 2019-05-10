@@ -7,6 +7,8 @@
 #include <string>
 using std::string;
 #include "Player.cpp"
+#include "Monster.cpp"
+#include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 char network[] = "MIT";  //SSID for 6.08 Lab
 string player = "Ze";
