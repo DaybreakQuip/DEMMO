@@ -119,9 +119,7 @@ class Game:
         changed_objects = []
         player_id = player.id
         # Process result of a fight
-        if health < 0:
-            raise ValueError("Error: New player health is less than 0")
-        elif health > player.get_health():
+        if health > player.get_health():
             raise ValueError("Error: New player health cannot be greater than before")
         # Find the monster the player defeated and update it
         monster = self.get_monster_on_top_of_player(player_id)
