@@ -31,7 +31,76 @@ class Fight{
   int getFightState() { return fightState; }
 
   void setFightState(int fightState) { this->fightState = fightState; }
+  
+void drawPlayerAttack(){
+   int period = 20;
+   draw->fillRect(5, 50, 20, 40, TFT_BLUE);
+   draw->fillRect(100, 50, 20, 40,TFT_RED);
+   draw->fillCircle(20, 54, 1, TFT_WHITE);
+   draw->fillCircle(103, 54, 1, TFT_PURPLE);
+   for (int i = 15; i < 97; i = i + 2){
+      int timer = millis();
+      draw->fillCircle(i, 70, 5,TFT_BLUE); 
+      while (millis() - timer < period) {}
+      draw->fillCircle(i, 70, 5, TFT_BLACK);
+   }
+   draw->fillRect(5, 50, 20, 40, TFT_BLUE);
+   draw->fillRect(100, 50, 20, 40,TFT_RED);
+   draw->fillCircle(20, 54, 1, TFT_WHITE);
+   draw->fillCircle(103, 54, 1, TFT_PURPLE);
+}
 
+void drawMonsterAttack(){
+   int period = 20;
+   draw->fillRect(5, 50, 20, 40, TFT_BLUE);
+   draw->fillRect(100, 50, 20, 40,TFT_RED);
+   draw->fillCircle(20, 54, 1, TFT_WHITE);
+   draw->fillCircle(103, 54, 1, TFT_PURPLE);
+   for (int i = 110; i > 25; i= i - 2){
+      int timer = millis();
+      draw->fillCircle(i, 70, 5,TFT_RED); 
+      while (millis() - timer < period) {}
+      draw->fillCircle(i, 70, 5, TFT_BLACK);
+   }
+   draw->fillRect(5, 50, 20, 40, TFT_BLUE);
+   draw->fillRect(100, 50, 20, 40,TFT_RED);
+   draw->fillCircle(20, 54, 1, TFT_WHITE);
+   draw->fillCircle(103, 54, 1, TFT_PURPLE);
+}
+
+void drawPlayerDeath(){
+   int period = 5;
+   for (int i = 5; i < 26; i= i + 2){
+      for (int j = 50; j < 91; j++){
+          int timer = millis();
+          draw->fillRect(i,j, 1,1, TFT_BLACK);
+          while (millis() - timer < period) {}
+          draw->fillRect(26-i+5,j, 1,1, TFT_BLACK);
+          while (millis() - timer < period) {}
+          draw->fillRect(i,91-j+50, 1,1, TFT_BLACK);
+          while (millis() - timer < period) {}
+          draw->fillRect(26-i+5,91-j+50, 1,1, TFT_BLACK);
+
+      }
+   }
+}
+
+void drawMonsterDeath(){
+  int period = 5;
+  for (int i = 101; i < 122; i= i + 2){
+      for (int j = 50; j < 91; j++){
+          int timer = millis();
+          draw->fillRect(i,j, 1,1, TFT_BLACK);
+          while (millis() - timer < period) {}
+          draw->fillRect(122-i+101,j, 1,1, TFT_BLACK);
+          while (millis() - timer < period) {}
+          draw->fillRect(i,91-j+50, 1,1, TFT_BLACK);
+          while (millis() - timer < period) {}
+          draw->fillRect(122-i+101,91-j+50, 1,1, TFT_BLACK);
+
+      }
+   }
+}
   int randomizeAttack(int attack) {
     int randomNum = random(80, 120);
     return int(attack * (randomNum / 10.0));
