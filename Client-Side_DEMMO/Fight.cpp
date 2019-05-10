@@ -82,14 +82,13 @@ class Fight{
             draw->fillRect(i,91-j+50, 1,1, TFT_BLACK);
             while (millis() - timer < period) {}
             draw->fillRect(26-i+5,91-j+50, 1,1, TFT_BLACK);
-
         }
      }
   }
 
   void drawMonsterDeath(){
     int period = 5;
-    for (int i = 101; i < 122; i= i + 2){
+    for (int i = 101; i < 124; i= i + 2){
         for (int j = 50; j < 91; j++){
             int timer = millis();
             draw->fillRect(i,j, 1,1, TFT_BLACK);
