@@ -32,8 +32,9 @@ class TestGame(unittest.TestCase):
         ]
 
         game = Game(rows, columns, players, monsters)
-        expected = '<xmp>---------------------\n|  0|  1|  2|  3|  4|\n---------------------\n|  5|  6|  7|  8|  9|\n---------------------\n| 10| 11| 12| 13| 14|\n---------------------\n| 15| 16| 17| 18| 19|\n---------------------\n| 20| 21| 22| 23| 24|\n---------------------\n\n[0]:\n\tPlayer(s):\n\t\t(id: Lucian, health: 10, power: 5, luck: 5, gold: 0, bosses defeated: 0)\n\tMonster(s):\n\t\t(id: Baron, health: 9001, power: 200, is boss: False, defeated by: {})\n[6]:\n\tPlayer(s):\n\t\t(id: Caitlyn, health: 10, power: 5, luck: 5, gold: 0, bosses defeated: 0)\n[7]:\n\tMonster(s):\n\t\t(id: Dragon, health: 1000, power: 100, is boss: False, defeated by: {})\n[14]:\n\tPlayer(s):\n\t\t(id: Teemo, health: 10, power: 5, luck: 5, gold: 0, bosses defeated: 0)\n[22]:\n\tPlayer(s):\n\t\t(id: Ze, health: 10, power: 5, luck: 5, gold: 0, bosses defeated: 0)\n[23]:\n\tMonster(s):\n\t\t(id: Raptor, health: 100, power: 5, is boss: False, defeated by: {})</xmp>'
+        expected = '<xmp>---------------------\n|  0|  1|  2|  3|  4|\n---------------------\n|  5|  6|  7|  8|  9|\n---------------------\n| 10| 11| 12| 13| 14|\n---------------------\n| 15| 16| 17| 18| 19|\n---------------------\n| 20| 21| 22| 23| 24|\n---------------------\n\n[0]:\n\tPlayer(s):\n\t\t(id: Lucian, health: 10, power: 5, luck: 5, gold: 0, bosses defeated: 0)\n\tMonster(s):\n\t\t(id: Baron, health: 9001, power: 200, is boss: False, defeated by: set())\n[6]:\n\tPlayer(s):\n\t\t(id: Caitlyn, health: 10, power: 5, luck: 5, gold: 0, bosses defeated: 0)\n[7]:\n\tMonster(s):\n\t\t(id: Dragon, health: 1000, power: 100, is boss: False, defeated by: set())\n[14]:\n\tPlayer(s):\n\t\t(id: Teemo, health: 10, power: 5, luck: 5, gold: 0, bosses defeated: 0)\n[22]:\n\tPlayer(s):\n\t\t(id: Ze, health: 10, power: 5, luck: 5, gold: 0, bosses defeated: 0)\n[23]:\n\tMonster(s):\n\t\t(id: Raptor, health: 100, power: 5, is boss: False, defeated by: set())</xmp>'
         result = game.get_server_map()
+        print(result.__repr__())
         self.assertEqual(expected, result)
 
 class TestDatabase(unittest.TestCase):
@@ -141,7 +142,7 @@ class TestSerialize(unittest.TestCase):
         # Serialize and check if database is updated
         Serialize.updateGameObjects(game_objects, test_database)
 
-        self.assertEqual([('NotAMonster', 2, 1, 10, 1, 'False', '{}'), ('NotABoss', 0, 1, 10, 5, 'True', "{'NotZe'}")],
+        self.assertEqual([('NotAMonster', 2, 1, 10, 1, 'False', 'set()'), ('NotABoss', 0, 1, 10, 5, 'True', "{'NotZe'}")],
                          Database.get_all_monsters(test_database))
         self.assertEqual([('NotZe', 2, 4, 1000, 5, 0, 0, 0), ('DefinitelyZe', 2, 1, 1, 999, 1, 100, 0)],
                          Database.get_all_players(test_database))
@@ -189,7 +190,7 @@ class TestAction(unittest.TestCase):
         # Serialize and check if database is updated
         Serialize.updateGameObjects(game_objects, test_database)
 
-        self.assertEqual([('NotAMonster', 2, 1, 10, 1, 'False', '{}'), ('NotABoss', 0, 1, 10, 5, 'True', "{'NotZe'}")],
+        self.assertEqual([('NotAMonster', 2, 1, 10, 1, 'False', 'set()'), ('NotABoss', 0, 1, 10, 5, 'True', "{'NotZe'}")],
                          Database.get_all_monsters(test_database))
         self.assertEqual([('MoveLeftWall', 3, 0, 1, 1000, 5, 0, 0), ('MoveRightWall', 1, 9, 2, 1, 999, 1, 100),
                           ('MoveUpWall', 0, 5, 3, 1000, 5, 0, 0), ('MoveDownWall', 9, 3, 4, 1000, 5, 0, 0),
