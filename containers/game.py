@@ -123,16 +123,18 @@ class Game:
             raise ValueError("Error: New player health is less than 0")
         elif health > player.get_health():
             raise ValueError("Error: New player health cannot be greater than before")
-        player.health = health  # passed checks, update player health
         # Find the monster the player defeated and update it
         monster = self.get_monster_on_top_of_player(player_id)
-        if monster is not None and monster.is_boss:
-            monster.defeated_by.add(player_id)
         # If the player won the fight, increase the player's boss defeat count and increase their gold
         if health > 0: # player won the fight!
-            player.num_boss_defeated += 1
+            if monster is not None and monster.is_boss:
+                if player_id in monster.defeated_by:
+                    return [] # Cannot defeat the same boss again!
+                monster.defeated_by.add(player_id)
+                player.num_boss_defeated += 1
             player.gold += monster.get_gold()
 
+        player.health = health  # passed checks, update player health
         changed_objects.append(monster)
         changed_objects.append(player)
         return changed_objects
