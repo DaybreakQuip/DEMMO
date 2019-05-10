@@ -110,6 +110,7 @@ class Fight{
   }
 
   boolean startFight(Monster* monster) {
+<<<<<<< HEAD
     switch (fightState) {
       case IDLE:
         {
@@ -155,17 +156,54 @@ class Fight{
           } else { // monster is dead
             drawMonsterDeath();
             fightState = FIGHT_END; 
+=======
+    while (fightState != FIGHT_END) {
+      switch (fightState) {
+        case IDLE:
+          {
+            fightState = PLAYER_TURN; // player goes first
+            break;
           }
-          break;
-        }
-      case FIGHT_END:
-        {
-          fightState = IDLE;
-          // return true if player wins, false otherwise
-          return player->getHealth() > 0;
-          break;
-        }
-    }
+        case PLAYER_TURN:
+          {
+            if (player->getHealth() > 0) { // player is alive
+              // <player attacks on button press>
+              // <insert button logic here>
+              int playerAttack = 100; // test damage
+              int randNumber = random(100);
+              if (randNumber < player->getLuck()) {
+                playerAttack = ((1 + critMultiplier) * player->getPower());
+              } else {
+                playerAttack = player->getPower();
+              }
+              playerAttack = randomizeAttack(playerAttack);
+              monster->setHealth(monster->getHealth() - playerAttack);
+              fightState = MONSTER_TURN;
+            } else { // player is dead
+              fightState = FIGHT_END;
+            }
+            break;
+          }
+        case MONSTER_TURN:
+          {
+            if (monster->getHealth() > 0) { // monster is alive
+              // monster responds automatically if alive
+              int monsterAttack = monster->getPower(); // test damage
+              monsterAttack = randomizeAttack(monsterAttack);
+              player->setHealth(player->getHealth() - monsterAttack);
+              fightState = PLAYER_TURN;
+            } else { // monster is dead
+              fightState = FIGHT_END; 
+            }
+            break;
+>>>>>>> 45a76c6d7a4220821e0dcc15b703596c9d7c14d8
+          }
+      }
+    } 
+    
+    fightState = IDLE;
+    // return true if player wins, false otherwise
+    return player->getHealth() > 0;
   }
 };
 #endif
