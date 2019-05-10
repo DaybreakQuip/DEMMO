@@ -95,7 +95,6 @@ string action(){
       }
       else if (LR < 1000){
        return post_request("left");
-
       }
       else if (UD >= 3000){
        return post_request("down");
@@ -106,6 +105,8 @@ string action(){
       else{
         return "";
       }
+      break;
+    case FIGHT:
       break;
     }
 }
