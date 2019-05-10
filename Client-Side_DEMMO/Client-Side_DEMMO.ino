@@ -139,7 +139,7 @@ string action(){
             } else {
               // go to state that wipes player
             }
-            return ""; //post_request(me.getPlayerName(), action);
+            return post_request(me.getPlayerName(), action);
           }
      case END:
           state = START;
