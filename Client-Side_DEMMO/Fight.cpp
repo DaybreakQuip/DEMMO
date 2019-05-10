@@ -108,59 +108,52 @@ class Fight{
   }
 
   boolean startFight(Monster* monster) {
-    switch (fightState) {
-      case IDLE:
-        {
-          fightState = PLAYER_TURN; // player goes first
-          break;
-        }
-      case PLAYER_TURN:
-        {
-          if (player->getHealth() > 0) { // player is alive
-            // <player attacks on button press>
-            // <insert button logic here>
-            int playerAttack = 100; // test damage
-            int randNumber = random(100);
-            if (randNumber < player->getLuck()) {
-              playerAttack = ((1 + critMultiplier) * player->getPower());
-            } else {
-              playerAttack = player->getPower();
+    while (fightState != FIGHT_END) {
+      switch (fightState) {
+        case IDLE:
+          {
+            fightState = PLAYER_TURN; // player goes first
+            break;
+          }
+        case PLAYER_TURN:
+          {
+            if (player->getHealth() > 0) { // player is alive
+              // <player attacks on button press>
+              // <insert button logic here>
+              int playerAttack = 100; // test damage
+              int randNumber = random(100);
+              if (randNumber < player->getLuck()) {
+                playerAttack = ((1 + critMultiplier) * player->getPower());
+              } else {
+                playerAttack = player->getPower();
+              }
+              playerAttack = randomizeAttack(playerAttack);
+              monster->setHealth(monster->getHealth() - playerAttack);
+              fightState = MONSTER_TURN;
+            } else { // player is dead
+              fightState = FIGHT_END;
             }
-            playerAttack = randomizeAttack(playerAttack);
-            Serial.print("Player attack: ");
-            Serial.println(playerAttack);
-            
-            monster->setHealth(monster->getHealth() - playerAttack);
-            fightState = MONSTER_TURN;
-          } else { // player is dead
-            fightState = FIGHT_END;
+            break;
           }
-          break;
-        }
-      case MONSTER_TURN:
-        {
-          if (monster->getHealth() > 0) { // monster is alive
-            // monster responds automatically if alive
-            int monsterAttack = monster->getPower(); // test damage
-            monsterAttack = randomizeAttack(monsterAttack);
-            Serial.print("Monster attack: ");
-            Serial.println(monsterAttack);
-            
-            player->setHealth(player->getHealth() - monsterAttack);
-            fightState = PLAYER_TURN;
-          } else { // monster is dead
-            fightState = FIGHT_END; 
+        case MONSTER_TURN:
+          {
+            if (monster->getHealth() > 0) { // monster is alive
+              // monster responds automatically if alive
+              int monsterAttack = monster->getPower(); // test damage
+              monsterAttack = randomizeAttack(monsterAttack);
+              player->setHealth(player->getHealth() - monsterAttack);
+              fightState = PLAYER_TURN;
+            } else { // monster is dead
+              fightState = FIGHT_END; 
+            }
+            break;
           }
-          break;
-        }
-      case FIGHT_END:
-        {
-          fightState = IDLE;
-          // return true if player wins, false otherwise
-          return player->getHealth() > 0;
-          break;
-        }
-    }
+      }
+    } 
+    
+    fightState = IDLE;
+    // return true if player wins, false otherwise
+    return player->getHealth() > 0;
   }
 };
 #endif
