@@ -1,6 +1,24 @@
 {
   "monsters": [
     {
+      "id": "Weak minion",
+      "row": 0,
+      "col": 0,
+      "health": 1,
+      "power": 0,
+      "is_boss": false,
+      "defeated_by": []
+    },
+    {
+      "id": "Boss minion",
+      "row": 0,
+      "col": 1,
+      "health": 1,
+      "power": 0,
+      "is_boss": true,
+      "defeated_by": []
+    },
+    {
       "id": "Dragon",
       "row": 3,
       "col": 1,
