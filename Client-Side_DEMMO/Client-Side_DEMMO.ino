@@ -85,18 +85,28 @@ void loop() {
           buttonTimer = millis();
       }
       string server_response = action();
-      Serial.print("server response: ");
-      Serial.println(server_response.c_str());
       if (server_response.length() > 0){
+          Serial.print("server response: ");
+          Serial.println(server_response.c_str());
+        
           int token_index = server_response.find('|');
           string player_stats = server_response.substr(0, token_index);
           
           string remaining_info = server_response.substr(token_index+1);
-          token_index = remaining_info.find(',');
+          token_index = remaining_info.find('|');
           
-          string test_map = remaining_info.substr(token_index + 1);
-          string monster_info = remaining_info.substr(token_index+1);
-         
+          string test_map = remaining_info.substr(0, token_index + 1);
+          //string monster_info = remaining_info.substr(token_index+1);
+
+          //if (monster_info.at(0) == 'T') {
+            //Serial.println("monster here");
+          //} else {
+            //Serial.println("monster already killed");
+          //}
+
+          Serial.print("monster info");
+          //Serial.println(monster_info.c_str());
+          
           randNumber = random(0, 11);
           moveTimer = millis();
           me.drawMap(test_map);
