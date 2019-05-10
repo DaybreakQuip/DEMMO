@@ -11,7 +11,7 @@ using std::string;
 //#include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 char network[] = "MIT";  //SSID for 6.08 Lab
-string player = "Ze";
+string player = "BOB";
 //char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
 const uint8_t IUD = 32; //pin connected to button 
 const uint8_t ILR = 33; //pin connected to button
@@ -276,8 +276,9 @@ void loop() {
           if (monster_info.at(0) == 'T') {
             tft.fillScreen(TFT_BLACK);
             state = FIGHT;
-            token_index = monster_info.substr(2).find(',');
-            remaining_info = monster_info.substr(token_index);
+            token_index = monster_info.find(',');
+            remaining_info = monster_info.substr(token_index+1);
+            Serial.println(remaining_info.c_str());
             token_index = remaining_info.find(',');
             monster.setHealth(atoi(remaining_info.substr(0,token_index).c_str()));
             monster.setPower(atoi(remaining_info.substr(token_index+1).c_str()));
@@ -299,7 +300,7 @@ string action(){
   switch(state){
     case START:
       tft.setCursor(0,0,1);
-      tft.println("Welcome to the Game! Press button to continue.");
+      tft.println("Welcome to DEMMO! Press button to continue.");
       if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
           Serial.println("Button has been pressed, starting the game!");
           tft.fillScreen(TFT_BLACK);
