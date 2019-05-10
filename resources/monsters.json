@@ -1,21 +1,106 @@
 {
   "monsters": [
     {
-      "id": "Weak minion",
+      "id": "Weak Boss",
       "row": 0,
-      "col": 0,
-      "health": 1,
+      "col": 4,
+      "health": 15,
+      "power": 0,
+      "is_boss": true,
+      "defeated_by": []
+    },
+    {
+      "id": "Weak minion",
+      "row": 2,
+      "col": 5,
+      "health": 5,
       "power": 0,
       "is_boss": false,
       "defeated_by": []
     },
     {
-      "id": "Boss minion",
+      "id": "Minion1",
+      "row": 2,
+      "col": 7,
+      "health": 5,
+      "power": 1,
+      "is_boss": false,
+      "defeated_by": []
+    },    {
+      "id": "Minion2",
+      "row": 4,
+      "col": 6,
+      "health": 5,
+      "power": 1,
+      "is_boss": false,
+      "defeated_by": []
+    },
+    {
+      "id": "Minion3",
+      "row": 7,
+      "col": 5,
+      "health": 5,
+      "power": 1,
+      "is_boss": false,
+      "defeated_by": []
+    },    {
+      "id": "Minion4",
+      "row": 8,
+      "col": 8,
+      "health": 5,
+      "power": 1,
+      "is_boss": false,
+      "defeated_by": []
+    },
+    {
+      "id": "Minion5",
+      "row": 5,
+      "col": 9,
+      "health": 5,
+      "power": 1,
+      "is_boss": false,
+      "defeated_by": []
+    },    {
+      "id": "Minion6",
+      "row": 7,
+      "col": 0,
+      "health": 5,
+      "power": 1,
+      "is_boss": false,
+      "defeated_by": []
+    },
+    {
+      "id": "Minion7",
+      "row": 9,
+      "col": 2,
+      "health": 5,
+      "power": 1,
+      "is_boss": false,
+      "defeated_by": []
+    },    {
+      "id": "Minion8",
+      "row": 5,
+      "col": 4,
+      "health": 5,
+      "power": 1,
+      "is_boss": false,
+      "defeated_by": []
+    },
+    {
+      "id": "Minion9",
       "row": 0,
-      "col": 1,
-      "health": 1,
-      "power": 0,
-      "is_boss": true,
+      "col": 9,
+      "health": 5,
+      "power": 1,
+      "is_boss": false,
+      "defeated_by": []
+    },    {
+      "id": "Minion10",
+      "row": 6,
+      "col": 3,
+      "health": 5,
+      "power": 1,
+      "is_boss": false,
       "defeated_by": []
     },
     {
