@@ -33,6 +33,7 @@ class Fight{
   void setFightState(int fightState) { this->fightState = fightState; }
   
   void drawPlayerAttack(){
+     draw->fillScreen(TFT_BLACK);
      int period = 20;
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
@@ -51,6 +52,7 @@ class Fight{
   }
 
   void drawMonsterAttack(){
+     draw->fillScreen(TFT_BLACK);
      int period = 20;
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
@@ -80,14 +82,13 @@ class Fight{
             draw->fillRect(i,91-j+50, 1,1, TFT_BLACK);
             while (millis() - timer < period) {}
             draw->fillRect(26-i+5,91-j+50, 1,1, TFT_BLACK);
-
         }
      }
   }
 
   void drawMonsterDeath(){
     int period = 5;
-    for (int i = 101; i < 122; i= i + 2){
+    for (int i = 101; i < 124; i= i + 2){
         for (int j = 50; j < 91; j++){
             int timer = millis();
             draw->fillRect(i,j, 1,1, TFT_BLACK);
@@ -108,59 +109,56 @@ class Fight{
   }
 
   boolean startFight(Monster* monster) {
-    switch (fightState) {
-      case IDLE:
-        {
-          fightState = PLAYER_TURN; // player goes first
-          break;
-        }
-      case PLAYER_TURN:
-        {
-          if (player->getHealth() > 0) { // player is alive
-            // <player attacks on button press>
-            // <insert button logic here>
-            int playerAttack = 100; // test damage
-            int randNumber = random(100);
-            if (randNumber < player->getLuck()) {
-              playerAttack = ((1 + critMultiplier) * player->getPower());
-            } else {
-              playerAttack = player->getPower();
+    while (fightState != FIGHT_END) {
+      switch (fightState) {
+        case IDLE:
+          {
+            fightState = PLAYER_TURN; // player goes first
+            break;
+          }
+        case PLAYER_TURN:
+          {
+            if (player->getHealth() > 0) { // player is alive
+              // <player attacks on button press>
+              // <insert button logic here>
+              int playerAttack = 100; // test damage
+              int randNumber = random(100);
+              drawPlayerAttack();
+              if (randNumber < player->getLuck()) {
+                playerAttack = ((1 + critMultiplier) * player->getPower());
+              } else {
+                playerAttack = player->getPower();
+              }
+              playerAttack = randomizeAttack(playerAttack);
+              monster->setHealth(monster->getHealth() - playerAttack);
+              fightState = MONSTER_TURN;
+            } else { // player is dead
+              drawPlayerDeath();
+              fightState = FIGHT_END;
             }
-            playerAttack = randomizeAttack(playerAttack);
-            Serial.print("Player attack: ");
-            Serial.println(playerAttack);
-            
-            monster->setHealth(monster->getHealth() - playerAttack);
-            fightState = MONSTER_TURN;
-          } else { // player is dead
-            fightState = FIGHT_END;
+            break;
           }
-          break;
-        }
-      case MONSTER_TURN:
-        {
-          if (monster->getHealth() > 0) { // monster is alive
-            // monster responds automatically if alive
-            int monsterAttack = monster->getPower(); // test damage
-            monsterAttack = randomizeAttack(monsterAttack);
-            Serial.print("Monster attack: ");
-            Serial.println(monsterAttack);
-            
-            player->setHealth(player->getHealth() - monsterAttack);
-            fightState = PLAYER_TURN;
-          } else { // monster is dead
-            fightState = FIGHT_END; 
+        case MONSTER_TURN:
+          {
+            if (monster->getHealth() > 0) { // monster is alive
+              // monster responds automatically if alive
+              int monsterAttack = monster->getPower(); // test damage
+              monsterAttack = randomizeAttack(monsterAttack);
+              player->setHealth(player->getHealth() - monsterAttack);
+              fightState = PLAYER_TURN;
+              drawMonsterAttack();
+            } else { // monster is dead
+              fightState = FIGHT_END; 
+              drawMonsterDeath();
+            }
+            break;
           }
-          break;
-        }
-      case FIGHT_END:
-        {
-          fightState = IDLE;
-          // return true if player wins, false otherwise
-          return player->getHealth() > 0;
-          break;
-        }
-    }
+      }
+    } 
+    
+    fightState = IDLE;
+    // return true if player wins, false otherwise
+    return player->getHealth() > 0;
   }
 };
 #endif

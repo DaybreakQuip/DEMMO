@@ -11,7 +11,7 @@ using std::string;
 #include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 char network[] = "MIT";  //SSID for 6.08 Lab
-string player = "Jessica";
+string player = "Ze";
 //char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
 const uint8_t IUD = 32; //pin connected to button 
 const uint8_t ILR = 33; //pin connected to button
@@ -77,6 +77,7 @@ void setup() {
 void loop() {
       if (digitalRead(BUTTON_2)==0 && (millis() - buttonTimer > 500) && state == MOVE){
           state = QUIT;
+          tft.fillScreen(TFT_BLACK);
           buttonTimer = millis();
       }
       string server_response = action();
@@ -94,6 +95,7 @@ void loop() {
           string monster_info = remaining_info.substr(token_index+1);
 
           if (monster_info.at(0) == 'T') {
+            tft.fillScreen(TFT_BLACK);
             state = FIGHT;
             token_index = monster_info.substr(2).find(',');
             remaining_info = monster_info.substr(token_index);
@@ -168,8 +170,9 @@ string action(){
             }
             char buffer[20];
             string action = "fight_result&health=" + string(itoa(me.getHealth(), buffer, 10));
+            Serial.println(action.c_str());
+            string server_response = post_request(me.getPlayerName(), action);
             if (playerWins) {
-                string server_response = post_request(me.getPlayerName(), action);
                 int token_index = server_response.find('|');
                 string player_stats = server_response.substr(0, token_index);
                 string test_map = server_response.substr(token_index + 1);
@@ -192,6 +195,8 @@ string action(){
           }
           return "";
      case QUIT:
+           tft.setCursor(0,0,1);
+            tft.println("Do you want to quit?");
           if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
               state = START;
               buttonTimer = millis();
