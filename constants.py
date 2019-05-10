@@ -14,7 +14,7 @@ PROJECT_HOME = server_path.SERVER_PATH if IS_SERVER else ""
 class Player:
     DEFAULT_ROW = 0
     DEFAULT_COL = 0
-    DEFAULT_HEALTH = 5
+    DEFAULT_HEALTH = 10
     DEFAULT_POWER = 5
     DEFAULT_LUCK = 5
     DEFAULT_GOLD = 0
