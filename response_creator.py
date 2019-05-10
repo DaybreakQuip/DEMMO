@@ -32,7 +32,7 @@ class ResponseCreator:
         if not monster: # if there is no monster on top of the player
             response = "F"
         else:
-            health, power, _, _ = monster.get_monster_stats()
+            health, power, is_boss, _ = monster.get_monster_stats()
             response = "T,{},{}".format(health, power)
         return response
 
@@ -63,14 +63,23 @@ class ResponseCreator:
                 neighbor_col = player_col_coord + col
                 if self.game.map.is_coordinate_in_range(neighbor_row, neighbor_col):
                     tile = self.game.map.get_tile(neighbor_row,neighbor_col)
-                    if tile.get_number_of_players() > 0 and tile.get_number_of_monsters() > 0:
-                        entities += "MP,"
-                    elif tile.get_number_of_monsters() > 0:
-                        entities += "M_,"
-                    elif tile.get_number_of_players() > 0:
-                        entities += "_P,"
+                    # add M (monster), B (boss), or _ (no monster or boss)
+                    if tile.has_monster():
+                        monster_id = tile.get_monster()
+                        monster = self.game.id_to_monsters[monster_id]
+                        if not monster.is_boss:
+                            entities += "M"
+                        else:
+                            # if the player has already defeated the boss, don't add the boss to the map
+                            if player_id not in monster.defeated_by:
+                                entities += "B"
+                            else:
+                                entities += "_"
                     else:
-                        entities += "__,"
+                        entities += "_"
+                    # add P( player) or _ (no player)
+                    entities += "P" if tile.get_number_of_players() > 0 else "_"
+                    entities += ","
                 else:
                     entities += "XX,"
         return entities
