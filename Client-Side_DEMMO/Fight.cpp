@@ -33,6 +33,7 @@ class Fight{
   void setFightState(int fightState) { this->fightState = fightState; }
   
   void drawPlayerAttack(){
+     draw->fillScreen(TFT_BLACK);
      int period = 20;
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
@@ -51,6 +52,7 @@ class Fight{
   }
 
   void drawMonsterAttack(){
+     draw->fillScreen(TFT_BLACK);
      int period = 20;
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
@@ -122,6 +124,7 @@ class Fight{
               // <insert button logic here>
               int playerAttack = 100; // test damage
               int randNumber = random(100);
+              drawPlayerAttack();
               if (randNumber < player->getLuck()) {
                 playerAttack = ((1 + critMultiplier) * player->getPower());
               } else {
@@ -131,6 +134,7 @@ class Fight{
               monster->setHealth(monster->getHealth() - playerAttack);
               fightState = MONSTER_TURN;
             } else { // player is dead
+              drawPlayerDeath();
               fightState = FIGHT_END;
             }
             break;
@@ -143,8 +147,10 @@ class Fight{
               monsterAttack = randomizeAttack(monsterAttack);
               player->setHealth(player->getHealth() - monsterAttack);
               fightState = PLAYER_TURN;
+              drawMonsterAttack();
             } else { // monster is dead
               fightState = FIGHT_END; 
+              drawMonsterDeath();
             }
             break;
           }
