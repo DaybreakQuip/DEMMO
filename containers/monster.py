@@ -19,7 +19,7 @@ class Monster(GameObject):
         #       interact with a monster
         super().__init__(id, row, col, health, power)
         if not defeated_by:
-            defeated_by = {}
+            defeated_by = set()
         self.is_boss = is_boss
         self.defeated_by = defeated_by
 
