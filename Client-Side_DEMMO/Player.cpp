@@ -20,25 +20,45 @@ class Player{
     draw = tft_to_use;
   }
 
-  int getHealth() { return health; }
+  int getHealth() { 
+    return health; 
+  }
+  
+  void setHealth(int health) { 
+    this->health = health; 
+  }
 
-  int getPower() { return power; }
+  int getPower() { 
+    return power; 
+  }
 
-  int getLuck() { return luck; }
+  void setPower(int power) { 
+    this->power = power; 
+  }
 
-  int getGold() { return gold; }
+  int getLuck() { 
+    return luck; 
+  }
 
-  int getNumBossDefeated() { return numBossDefeated; }
+  void setLuck() { 
+    this->luck = luck; 
+  }
 
-  void setHealth(int health) { this->health = health; }
+  int getGold() { 
+    return gold; 
+  }
 
-  void setPower(int power) { this->power = power; }
+  void setGold() { 
+    this->gold = gold; 
+  }
 
-  void setLuck() { this->luck = luck; }
+  int getNumBossDefeated() { 
+    return numBossDefeated; 
+  }
 
-  void setGold() { this->gold = gold; }
-
-  void setNumBossDefeated() { this->numBossDefeated = numBossDefeated; }
+  void setNumBossDefeated() { 
+    this->numBossDefeated = numBossDefeated; 
+  }
   
   void drawMap(string player_map){
     const uint16_t BACKGROUND_COLOR = TFT_BLACK;
