@@ -23,6 +23,12 @@ class Monster(GameObject):
         self.is_boss = is_boss
         self.defeated_by = defeated_by
 
+    def get_gold(self):
+        if self.is_boss:
+            return 2 * self.health + self.power
+        else:
+            return self.health + self.power
+
     def get_is_boss(self):
         return self.is_boss
 

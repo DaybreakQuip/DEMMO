@@ -41,6 +41,8 @@ class Database:
 			'''CREATE TABLE IF NOT EXISTS player_table (id text, row int, col int, health int, power int, luck int, gold int, num_bosses_defeated int);''')  # run a CREATE TABLE command
 		c.execute(
 			'''CREATE TABLE IF NOT EXISTS monster_table (id text, row int, col int, health int, power int, is_boss text, defeated_by text);''')  # run a CREATE TABLE command
+		c.execute(
+			'''CREATE TABLE IF NOT EXISTS record_table (id text, num_bosses_defeated int);''')  # run a CREATE TABLE command
 		conn.commit()  # commit commands
 		conn.close()  # close connection to database
 
