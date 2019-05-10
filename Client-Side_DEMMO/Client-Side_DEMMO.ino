@@ -11,7 +11,7 @@ using std::string;
 #include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 char network[] = "MIT";  //SSID for 6.08 Lab
-string player = "Ze";
+string player = "Jessica";
 //char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
 const uint8_t IUD = 32; //pin connected to button 
 const uint8_t ILR = 33; //pin connected to button
@@ -29,6 +29,7 @@ int randNumber;
 unsigned long buttonTimer; //timer to make sure multiple button presses do not occur
 Player me(&tft, player);
 Monster monster(5,10); // dummy monster
+Fight fight(&me, &monster, &tft); // dummy fight
 
 void setup() {
   Serial.begin(115200); //for debugging if needed.
@@ -94,10 +95,11 @@ void loop() {
 
           if (monster_info.at(0) == 'T') {
             state = FIGHT;
-            token_index = monster_info.find(',');
-            monster.setHealth(atoi(monster_info.substr(2,token_index).c_str()));
-            remaining_info = monster_info.substr(token_index+1);
-            monster.setPower(atoi(remaining_info.c_str()));
+            token_index = monster_info.substr(2).find(',');
+            remaining_info = monster_info.substr(token_index);
+            token_index = remaining_info.find(',');
+            monster.setHealth(atoi(remaining_info.substr(0,token_index).c_str()));
+            monster.setPower(atoi(remaining_info.substr(token_index+1).c_str()));
           } else {
             Serial.println("no monster");
           }
@@ -111,11 +113,12 @@ void loop() {
 } 
 
 string action(){
-  Serial.print("state: ");
-  Serial.println(state);
+  //Serial.print("state: ");
+  //Serial.println(state);
   switch(state){
     case START:
-      tft.drawString("Welcome to the Game! Press button to continue.", 0, 0, 1);
+      tft.setCursor(0,0,1);
+      //tft.println("Welcome to the Game! Press button to continue.");
       if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
           Serial.println("Button has been pressed, starting the game!");
           tft.fillScreen(TFT_BLACK);
@@ -130,11 +133,11 @@ string action(){
       }
       return "";
     case MOVE:
-        Serial.println("Trying to move!");
+        //Serial.println("Trying to move!");
         if (millis() - moveTimer > 1500) {
           int LR = analogRead(ILR);
           int UD = analogRead(IUD);
-          Serial.println(LR);
+          //Serial.println(LR);
           if (LR >= 3000){
             return post_request(me.getPlayerName(), "right");
           }
@@ -156,11 +159,15 @@ string action(){
        }
      case FIGHT:
           {
-            Fight fight(&me, &monster, &tft); // dummy fight
             boolean playerWins = fight.startFight(&monster);
             Serial.print("player wins the fight? ");
-            Serial.println(playerWins);
-            string action = "fight_result&health=" + me.getHealth();
+            if (playerWins) {
+              Serial.println("yes");
+            } else {
+              Serial.println("no");
+            }
+            char buffer[20];
+            string action = "fight_result&health=" + string(itoa(me.getHealth(), buffer, 10));
             if (playerWins) {
                 string server_response = post_request(me.getPlayerName(), action);
                 int token_index = server_response.find('|');
