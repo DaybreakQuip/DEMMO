@@ -4,6 +4,7 @@
 #include <string>
 using namespace std;
 class Player{
+  string playerName;
   int health = 5;
   int power = 5;
   int luck = 5;
@@ -16,8 +17,17 @@ class Player{
   TFT_eSPI *draw;
   
   public:
-  Player(TFT_eSPI* tft_to_use){
+  Player(TFT_eSPI* tft_to_use, string playerName){
     draw = tft_to_use;
+    this->playerName = playerName;
+  }
+
+  string getPlayerName() {
+    return playerName;
+  }
+
+  void setPlayerName(string playerName) {
+    this->playerName = playerName;
   }
 
   int getHealth() { 

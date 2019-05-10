@@ -7,17 +7,19 @@ using namespace std;
 #define IDLE 0
 #define PLAYER_TURN 1
 #define MONSTER_TURN 2
-#define PLAYER_WIN 3
-#define MONSTER_WIN 4
+#define FIGHT_END 3
 
 class Fight{
   Player player;
   Monster monster;
   int fightState;
+  TFT_eSPI *draw;
+  
   public:
-  Fight(Player player, Monster monster){
+  Fight(Player player, Monster monster, TFT_eSPI* tft_to_use){
     this->player = player;
     this->monster = monster;
+    draw = tft_to_use;
     fightState = 0;
   }
 
@@ -38,7 +40,7 @@ class Fight{
             // player attacks
             fightState = MONSTER_TURN;
           } else { // player is dead
-            fightState = MONSTER_WIN;
+            fightState = FIGHT_END;
           }
           break;
         }
@@ -48,20 +50,17 @@ class Fight{
             // monster attacks
             fightState = PLAYER_TURN;
           } else { // monster is dead
-            fightState = PLAYER_WIN; 
+            fightState = FIGHT_END; 
           }
           break;
         }
-      case PLAYER_WIN:
+      case FIGHT_END:
         {
           fightState = IDLE;
-          return true;
-          break;
-        }
-      case MONSTER_WIN:
-        {
-          fightState = IDLE;
-          return false;
+          string action = "fight&health=" + player.getHealth();
+          post_request(player.getPlayerName(), action);
+          // return true if player wins, false otherwise
+          return player.getHealth() > 0;
           break;
         }
     }
