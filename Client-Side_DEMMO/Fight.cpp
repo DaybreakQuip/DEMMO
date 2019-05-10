@@ -16,12 +16,14 @@ using namespace std;
 class Fight{
   Player *player;
   Monster *monster;
+  TFT_eSPI *draw;
   int fightState;
     
   public:
-  Fight(Player* player, Monster* monster){
+  Fight(Player* player, Monster* monster, TFT_eSPI* tft_to_use){
     this->player = player;
     this->monster = monster;
+    draw = tft_to_use;
     fightState = 0;
   }
 

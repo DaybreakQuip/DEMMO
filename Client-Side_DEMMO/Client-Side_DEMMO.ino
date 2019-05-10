@@ -131,7 +131,7 @@ string action(){
      case FIGHT:
           {
             Monster monster(5,10); // dummy monster
-            Fight fight(&me, &monster); // dummy fight
+            Fight fight(&me, &monster, &tft); // dummy fight
             boolean playerWins = fight.startFight(&monster);
             string action = "fight&health=" + me.getHealth();
             if (playerWins) {
