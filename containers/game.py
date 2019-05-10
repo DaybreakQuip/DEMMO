@@ -75,21 +75,52 @@ class Game:
         monster = self.id_to_monsters[monster_id]
         return monster.get_monster_stats()
 
-    def execute(self, player_id, action):
+    def execute(self, **kwargs):
         """
         Executes a player action
-        :param playerAction: (string) representing the player action
+        :param kwargs: (dict) contains player_id, action, and additional parameters that indicator the player's actions
         :return: a list of game objects that have changed from executing player action
+        :raises ValueError: if a value from kwargs is invalid
         """
+        action = kwargs['action']
+        player_id = kwargs['player_id']
+        player = self.id_to_players[player_id]
+
         changed_objects = []
         if action == constants.Game.DOWN:
-            changed_objects.append(self.id_to_players[player_id].move_down())
-        if action == constants.Game.UP:
-            changed_objects.append(self.id_to_players[player_id].move_up())
-        if action == constants.Game.LEFT:
-            changed_objects.append(self.id_to_players[player_id].move_left())
-        if action == constants.Game.RIGHT:
-            changed_objects.append(self.id_to_players[player_id].move_right())
+            # Move down
+            changed_objects.append(player.move_down())
+        elif action == constants.Game.UP:
+            # Move up
+            changed_objects.append(player.move_up())
+        elif action == constants.Game.LEFT:
+            # Move left
+            changed_objects.append(player.move_left())
+        elif action == constants.Game.RIGHT:
+            # Move right
+            changed_objects.append(player.move_right())
+        elif action == constants.Game.FIGHT_RESULT:
+            health = kwargs['health']
+            changed_objects.extend(self.process_fight_result(player, health))
+
+        return changed_objects
+
+    def process_fight_result(self, player, health):
+        changed_objects = []
+        player_id = player.id
+        # Process result of a fight
+        if health < 0:
+            raise ValueError("Error: New player health is less than 0")
+        elif health > player.get_health():
+            raise ValueError("Error: New player health cannot be greater than before")
+        player.health = health  # passed checks, update player health
+        changed_objects.append(player)
+
+        # Find the monster the player defeated and update it
+        monster = self.get_monster_on_top_of_player(player_id)
+        if monster is not None and monster.is_boss:
+            monster.defeated_by.add(player_id)
+            changed_objects.append(monster)
         return changed_objects
 
     def get_monster_on_top_of_player(self, player_id):
