@@ -3,14 +3,13 @@
 #include <string.h>  //used for some string handling and processing.
 #include <string>
 
-
 class Monster{
   private:
   int health;
   int power;
   int gold;
   boolean isBoss;
-  TFT_eSPI *draw;
+  public:
   Monster(int health, int power, int gold, boolean isBoss){
     this->health = health;
     this->power = power;

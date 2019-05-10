@@ -7,6 +7,8 @@
 #include <string>
 using std::string;
 #include "Player.cpp"
+#include "Monster.cpp"
+#include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 char network[] = "MIT";  //SSID for 6.08 Lab
 string player = "Ze";
@@ -101,7 +103,6 @@ string action(){
       }
       else if (LR < 1000){
        return post_request("left");
-
       }
       else if (UD >= 3000){
        return post_request("down");
@@ -112,6 +113,8 @@ string action(){
       else{
         return "";
       }
+      break;
+    case FIGHT:
       break;
     }
 }
