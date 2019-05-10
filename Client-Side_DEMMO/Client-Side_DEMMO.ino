@@ -76,6 +76,7 @@ void setup() {
 void loop() {
       if (digitalRead(BUTTON_2)==0 && (millis() - buttonTimer > 500) && state == MOVE){
           state = QUIT;
+          tft.fillScreen(TFT_BLACK);
           buttonTimer = millis();
       }
       string server_response = action();
@@ -93,6 +94,7 @@ void loop() {
           string monster_info = remaining_info.substr(token_index+1);
 
           if (monster_info.at(0) == 'T') {
+            tft.fillScreen(TFT_BLACK);
             state = FIGHT;
             token_index = monster_info.find(',');
             monster.setHealth(atoi(monster_info.substr(2,token_index).c_str()));
@@ -186,6 +188,8 @@ string action(){
           }
           return "";
      case QUIT:
+           tft.setCursor(0,0,1);
+            tft.println("Do you want to quit?");
           if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
               state = START;
               buttonTimer = millis();
