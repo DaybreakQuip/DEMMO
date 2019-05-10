@@ -65,7 +65,7 @@ void setup() {
     ESP.restart(); // restart the ESP (proper way)
   }
   randomSeed(analogRead(0));
-  string server_response = post_request(" ");
+  string server_response = post_request(me.getPlayerName(), " ");
   int token_index = server_response.find('|');
   string player_stats = server_response.substr(0, token_index);
   string test_map = server_response.substr(token_index + 1);
@@ -78,7 +78,7 @@ void setup() {
 }
 
 void loop() {
-      if (digitalRead(BUTTON_2) && millis() - buttomTimer > 500 && state = MOVE){
+      if (digitalRead(BUTTON_2) && (millis() - buttonTimer > 500) && state == MOVE){
           state = QUIT;
           buttonTimer = millis();
       }
@@ -98,10 +98,10 @@ void loop() {
 string action(){
   switch(state){
     case START:
-      tft.drawString("Welcome to the Game! Press button to continue.");
-      if (digitalRead(BUTTON_1) && millis() - buttomTimer > 500){
+      tft.drawString("Welcome to the Game! Press button to continue.", 0, 0, 1);
+      if (digitalRead(BUTTON_1) && (millis() - buttonTimer > 500)){
           state = MOVE;
-          return post_request(" ");
+          return post_request(me.getPlayerName(), " ");
       }
       return "";
     case MOVE:
@@ -132,12 +132,12 @@ string action(){
           state = START;
           return "";
      case QUIT:
-          if (digitalRead(BUTTON_1) && millis() - buttomTimer > 500){
+          if (digitalRead(BUTTON_1) && (millis() - buttonTimer > 500)){
               state = START;
               buttonTimer = millis();
               
           }
-          else if (digitalRead(BUTTON_1) && millis() - buttomTimer > 500){
+          else if (digitalRead(BUTTON_1) && (millis() - buttonTimer > 500)){
               state = MOVE;
               buttonTimer = millis();
           }

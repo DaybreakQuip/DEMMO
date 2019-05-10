@@ -12,13 +12,13 @@ using namespace std;
 #define FIGHT_END 3
 
 class Fight{
-  Player player;
-  Monster monster;
+  Player *player;
+  Monster *monster;
   int fightState;
   TFT_eSPI *draw;
   
   public:
-  Fight(Player player, Monster monster, TFT_eSPI* tft_to_use){
+  Fight(Player* player, Monster* monster, TFT_eSPI* tft_to_use){
     this->player = player;
     this->monster = monster;
     draw = tft_to_use;
@@ -29,7 +29,8 @@ class Fight{
 
   void setFightState(int fightState) { this->fightState = fightState; }
 
-  void startFight(Monster monster) {
+  boolean startFight(Monster* monster) {
+    this->monster = monster;
     switch (fightState) {
       case IDLE:
         {
@@ -38,7 +39,7 @@ class Fight{
         }
       case PLAYER_TURN:
         {
-          if (player.getHealth() > 0) { // player is alive
+          if (player->getHealth() > 0) { // player is alive
             // player attacks
             fightState = MONSTER_TURN;
           } else { // player is dead
@@ -48,7 +49,7 @@ class Fight{
         }
       case MONSTER_TURN:
         {
-          if (monster.getHealth() > 0) { // monster is alive
+          if (monster->getHealth() > 0) { // monster is alive
             // monster attacks
             fightState = PLAYER_TURN;
           } else { // monster is dead
@@ -59,10 +60,10 @@ class Fight{
       case FIGHT_END:
         {
           fightState = IDLE;
-          string action = "fight&health=" + player.getHealth();
-          post_request(player.getPlayerName(), action);
+          //string action = "fight&health=" + player.getHealth();
+          //post_request(player.getPlayerName(), action);
           // return true if player wins, false otherwise
-          return player.getHealth() > 0;
+          return player->getHealth() > 0;
           break;
         }
     }
