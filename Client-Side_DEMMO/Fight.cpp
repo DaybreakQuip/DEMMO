@@ -110,53 +110,6 @@ class Fight{
   }
 
   boolean startFight(Monster* monster) {
-<<<<<<< HEAD
-    switch (fightState) {
-      case IDLE:
-        {
-          fightState = PLAYER_TURN; // player goes first
-          break;
-        }
-      case PLAYER_TURN:
-        {
-          if (player->getHealth() > 0) { // player is alive
-            // <player attacks on button press>
-            // <insert button logic here>
-            drawPlayerAttack();
-            int playerAttack = 100; // test damage
-            int randNumber = random(100);
-            if (randNumber < player->getLuck()) {
-              playerAttack = ((1 + critMultiplier) * player->getPower());
-            } else {
-              playerAttack = player->getPower();
-            }
-            playerAttack = randomizeAttack(playerAttack);
-            Serial.print("Player attack: ");
-            Serial.println(playerAttack);
-            
-            monster->setHealth(monster->getHealth() - playerAttack);
-            fightState = MONSTER_TURN;
-          } else { // player is dead
-            drawPlayerDeath();
-            fightState = FIGHT_END;
-          }
-          break;
-        }
-      case MONSTER_TURN:
-        {
-          if (monster->getHealth() > 0) { // monster is alive
-            // monster responds automatically if alive
-            int monsterAttack = monster->getPower(); // test damage
-            monsterAttack = randomizeAttack(monsterAttack);
-            Serial.print("Monster attack: ");
-            Serial.println(monsterAttack);
-            drawMonsterAttack();
-            player->setHealth(player->getHealth() - monsterAttack);
-            fightState = PLAYER_TURN;
-          } else { // monster is dead
-            drawMonsterDeath();
-            fightState = FIGHT_END; 
-=======
     while (fightState != FIGHT_END) {
       switch (fightState) {
         case IDLE:
@@ -171,6 +124,7 @@ class Fight{
               // <insert button logic here>
               int playerAttack = 100; // test damage
               int randNumber = random(100);
+              drawPlayerAttack();
               if (randNumber < player->getLuck()) {
                 playerAttack = ((1 + critMultiplier) * player->getPower());
               } else {
@@ -180,6 +134,7 @@ class Fight{
               monster->setHealth(monster->getHealth() - playerAttack);
               fightState = MONSTER_TURN;
             } else { // player is dead
+              drawPlayerDeath();
               fightState = FIGHT_END;
             }
             break;
@@ -192,11 +147,12 @@ class Fight{
               monsterAttack = randomizeAttack(monsterAttack);
               player->setHealth(player->getHealth() - monsterAttack);
               fightState = PLAYER_TURN;
+              drawMonsterAttack();
             } else { // monster is dead
               fightState = FIGHT_END; 
+              drawMonsterDeath();
             }
             break;
->>>>>>> 45a76c6d7a4220821e0dcc15b703596c9d7c14d8
           }
       }
     } 
