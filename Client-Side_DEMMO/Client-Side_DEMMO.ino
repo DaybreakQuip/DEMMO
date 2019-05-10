@@ -68,14 +68,7 @@ void setup() {
     ESP.restart(); // restart the ESP (proper way)
   }
   randomSeed(analogRead(0));
-  string server_response = post_request(me.getPlayerName(), " ");
-  int token_index = server_response.find('|');
-  string player_stats = server_response.substr(0, token_index);
-  string test_map = server_response.substr(token_index + 1);
   randNumber = random(0, 11);
-  me.drawMap(test_map);
-  me.drawStats(player_stats);
-  me.drawFlavorText(randNumber);
   moveTimer = millis();
   buttonTimer = millis();
 }
@@ -125,8 +118,15 @@ string action(){
       tft.drawString("Welcome to the Game! Press button to continue.", 0, 0, 1);
       if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
           Serial.println("Button has been pressed, starting the game!");
+          tft.fillScreen(TFT_BLACK);
+          string server_response = post_request(me.getPlayerName(), " ");
+          int token_index = server_response.find('|');
+          string player_stats = server_response.substr(0, token_index);
+          string test_map = server_response.substr(token_index + 1);
+          me.drawMap(test_map);
+          me.drawStats(player_stats);
+          me.drawFlavorText(randNumber);
           state = MOVE;
-          return post_request(me.getPlayerName(), " ");
       }
       return "";
     case MOVE:
@@ -162,22 +162,35 @@ string action(){
             Serial.println(playerWins);
             string action = "fight_result&health=" + me.getHealth();
             if (playerWins) {
-              state = MOVE;
+                string server_response = post_request(me.getPlayerName(), action);
+                int token_index = server_response.find('|');
+                string player_stats = server_response.substr(0, token_index);
+                string test_map = server_response.substr(token_index + 1);
+                me.drawMap(test_map);
+                me.drawStats(player_stats);
+                me.drawFlavorText(randNumber);
+                state = MOVE;
             } else {
+              tft.fillScreen(TFT_BLACK);
               state = END;
             }
-            return post_request(me.getPlayerName(), action);
+            return "";
           }
      case END:
-          state = START;
+          tft.drawString("yOu LoSt!", 0, 0, 1);
+          if (digitalRead(BUTTON_1) == 0 && millis() - buttonTimer > 500){
+             state = START;
+             tft.fillScreen(TFT_BLACK);
+             buttonTimer = millis();
+          }
           return "";
      case QUIT:
-          if (digitalRead(BUTTON_1) && (millis() - buttonTimer > 500)){
+          if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
               state = START;
               buttonTimer = millis();
               
           }
-          else if (digitalRead(BUTTON_1) && (millis() - buttonTimer > 500)){
+          else if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
               state = MOVE;
               buttonTimer = millis();
           }
