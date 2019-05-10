@@ -29,6 +29,7 @@ int randNumber;
 unsigned long buttonTimer; //timer to make sure multiple button presses do not occur
 Player me(&tft, player);
 Monster monster(5,10); // dummy monster
+Fight fight(&me, &monster, &tft); // dummy fight
 
 void setup() {
   Serial.begin(115200); //for debugging if needed.
@@ -94,10 +95,11 @@ void loop() {
 
           if (monster_info.at(0) == 'T') {
             state = FIGHT;
-            token_index = monster_info.find(',');
-            monster.setHealth(atoi(monster_info.substr(2,token_index).c_str()));
-            remaining_info = monster_info.substr(token_index+1);
-            monster.setPower(atoi(remaining_info.c_str()));
+            token_index = monster_info.substr(2).find(',');
+            remaining_info = monster_info.substr(token_index);
+            token_index = remaining_info.find(',');
+            monster.setHealth(atoi(remaining_info.substr(0,token_index).c_str()));
+            monster.setPower(atoi(remaining_info.substr(token_index+1).c_str()));
           } else {
             Serial.println("no monster");
           }
@@ -157,7 +159,6 @@ string action(){
        }
      case FIGHT:
           {
-            Fight fight(&me, &monster, &tft); // dummy fight
             boolean playerWins = fight.startFight(&monster);
             Serial.print("player wins the fight? ");
             Serial.println(playerWins);

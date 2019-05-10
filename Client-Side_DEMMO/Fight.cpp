@@ -108,7 +108,6 @@ class Fight{
   }
 
   boolean startFight(Monster* monster) {
-    this->monster = monster;
     switch (fightState) {
       case IDLE:
         {
