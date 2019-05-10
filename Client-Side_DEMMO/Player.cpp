@@ -2,6 +2,8 @@
 #include <SPI.h> //Used in support of TFT Display
 #include <string.h>  //used for some string handling and processing.
 #include <string>
+#ifndef PLAYER_CPP
+#define PLAYER_CPP
 using namespace std;
 class Player{
   string playerName;
@@ -157,3 +159,4 @@ class Player{
       draw->println(flavor_text.c_str());
    }
 };
+#endif

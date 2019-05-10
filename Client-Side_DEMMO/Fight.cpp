@@ -2,6 +2,8 @@
 #include <SPI.h> //Used in support of TFT Display
 #include <string.h>  //used for some string handling and processing.
 #include <string>
+#ifndef FIGHT_CPP
+#define FIGHT_CPP
 #include "Player.cpp"
 #include "Monster.cpp"
 using namespace std;
@@ -15,13 +17,11 @@ class Fight{
   Player *player;
   Monster *monster;
   int fightState;
-  TFT_eSPI *draw;
-  
+    
   public:
-  Fight(Player* player, Monster* monster, TFT_eSPI* tft_to_use){
+  Fight(Player* player, Monster* monster){
     this->player = player;
     this->monster = monster;
-    draw = tft_to_use;
     fightState = 0;
   }
 
@@ -69,3 +69,4 @@ class Fight{
     }
   }
 };
+#endif

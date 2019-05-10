@@ -7,6 +7,8 @@
 #include <string>
 using std::string;
 #include "Player.cpp"
+#include "Monster.cpp"
+#include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 char network[] = "MIT";  //SSID for 6.08 Lab
 string player = "Ze";
@@ -127,7 +129,18 @@ string action(){
           }
        }
      case FIGHT:
-          return "";
+          {
+            Monster monster(5,10); // dummy monster
+            Fight fight(&me, &monster); // dummy fight
+            boolean playerWins = fight.startFight(&monster);
+            string action = "fight&health=" + me.getHealth();
+            if (playerWins) {
+              // go to some state
+            } else {
+              // go to state that wipes player
+            }
+            return ""; //post_request(me.getPlayerName(), action);
+          }
      case END:
           state = START;
           return "";

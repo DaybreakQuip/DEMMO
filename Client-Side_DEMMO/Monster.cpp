@@ -2,7 +2,8 @@
 #include <SPI.h> //Used in support of TFT Display
 #include <string.h>  //used for some string handling and processing.
 #include <string>
-
+#ifndef MONSTER_CPP
+#define MONSTER_CPP
 class Monster{
   private:
   int health;
@@ -22,3 +23,4 @@ class Monster{
     return power;
   }
 };
+#endif
