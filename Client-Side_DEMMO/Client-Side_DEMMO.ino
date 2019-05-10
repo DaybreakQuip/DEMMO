@@ -7,8 +7,6 @@
 #include <string>
 using std::string;
 #include "Player.cpp"
-#include "Monster.cpp"
-#include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 char network[] = "MIT";  //SSID for 6.08 Lab
 string player = "Ze";
@@ -23,9 +21,11 @@ MPU9255 imu; //imu object called, appropriately, imu
 #define MOVE 1 //state of player's action
 #define FIGHT 2 //state of player's action
 #define END 3
-unsigned long timer;
+#define QUIT 4
+unsigned long moveTimer;
 int randNumber;
-Player me(&tft);
+unsigned long buttonTimer; //timer to make sure multiple button presses do not occur
+Player me(&tft, player);
 
 void setup() {
   Serial.begin(115200); //for debugging if needed.
@@ -65,7 +65,7 @@ void setup() {
     ESP.restart(); // restart the ESP (proper way)
   }
   randomSeed(analogRead(0));
-  string server_response = post_request(" ");
+  string server_response = post_request(me.getPlayerName(), " ");
   int token_index = server_response.find('|');
   string player_stats = server_response.substr(0, token_index);
   string test_map = server_response.substr(token_index + 1);
@@ -73,48 +73,109 @@ void setup() {
   me.drawMap(test_map);
   me.drawStats(player_stats);
   me.drawFlavorText(randNumber);
-  timer = millis();
+  moveTimer = millis();
+  buttonTimer = millis();
 }
 
 void loop() {
-    if (millis() - timer > 1500) {
+      if (digitalRead(BUTTON_2) && (millis() - buttonTimer > 500) && state == MOVE){
+          state = QUIT;
+          buttonTimer = millis();
+      }
       string server_response = action();
       if (server_response.length() > 0){
           int token_index = server_response.find('|');
           string player_stats = server_response.substr(0, token_index);
           string test_map = server_response.substr(token_index + 1);
           randNumber = random(0, 11);
-          timer = millis();
+          moveTimer = millis();
           me.drawMap(test_map);
           me.drawStats(player_stats);
           me.drawFlavorText(randNumber);
-      }
     }
 }
 
 string action(){
   switch(state){
+    case START:
+      tft.drawString("Welcome to the Game! Press button to continue.", 0, 0, 1);
+      if (digitalRead(BUTTON_1) && (millis() - buttonTimer > 500)){
+          state = MOVE;
+          return post_request(me.getPlayerName(), " ");
+      }
+      return "";
     case MOVE:
-      int LR = analogRead(ILR);
-      int UD = analogRead(IUD);
-      Serial.println(LR);
-      if (LR >= 3000){
-        return post_request("right");
+        if (millis() - moveTimer > 1500) {
+          int LR = analogRead(ILR);
+          int UD = analogRead(IUD);
+          Serial.println(LR);
+          if (LR >= 3000){
+            return post_request(me.getPlayerName(), "right");
+          }
+          else if (LR < 1000){
+           return post_request(me.getPlayerName(),"left");
+    
+          }
+          else if (UD >= 3000){
+           return post_request(me.getPlayerName(),"down");
+          }
+          else if (UD < 1000){
+           return post_request(me.getPlayerName(),"up");
+          }
+          else{
+            return "";
+          }
+       }
+     case FIGHT:
+          return "";
+     case END:
+          state = START;
+          return "";
+     case QUIT:
+          if (digitalRead(BUTTON_1) && (millis() - buttonTimer > 500)){
+              state = START;
+              buttonTimer = millis();
+              
+          }
+          else if (digitalRead(BUTTON_1) && (millis() - buttonTimer > 500)){
+              state = MOVE;
+              buttonTimer = millis();
+          }
+          return "";
+  }
+        
+}
+
+string post_request(string player, string action){
+  //Note to self, to convert integer to string: string boss = "Boss: " + string(itoa(numBossDefeated, buffer, 10));
+  WiFiClient client;
+  string body = "player_id=" + player + "&action=" + action;
+  if (client.connect("608dev.net", 80)) {
+    client.println("POST http://608dev.net/sandbox/sc/zehang/DEMMO/request_handler.py HTTP/1.1");
+    client.println("Host: 608dev.net");
+    client.println("Content-Type: application/x-www-form-urlencoded");
+    client.print("Content-Length: ");
+    client.println(body.length());
+    client.println();
+    client.println(body.c_str());
+    //Serial.println(body.c_str());
+
+  }
+  string buff = "";
+  buff = "  ";
+  string response = "";
+  bool canRespond = false;
+  while(!client.available()){}
+   while ( client.available())
+    {
+      char resp = client.read();
+      buff += resp;
+      if (canRespond){
+        response += resp;
       }
-      else if (LR < 1000){
-       return post_request("left");
+      if (buff.substr(buff.length()-2, buff.length()) == "\n\r"){
+        canRespond = true;
       }
-      else if (UD >= 3000){
-       return post_request("down");
-      }
-      else if (UD < 1000){
-       return post_request("up");
-      }
-      else{
-        return "";
-      }
-      break;
-    case FIGHT:
-      break;
     }
+  return response.substr(1, response.length());
 }
