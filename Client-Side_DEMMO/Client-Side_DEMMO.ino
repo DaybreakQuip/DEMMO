@@ -8,10 +8,10 @@
 using std::string;
 #include "Player.cpp"
 #include "Monster.cpp"
-#include "Fight.cpp"
+//#include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 char network[] = "MIT";  //SSID for 6.08 Lab
-string player = "Ze";
+string player = "BOB";
 //char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
 const uint8_t IUD = 32; //pin connected to button 
 const uint8_t ILR = 33; //pin connected to button
@@ -24,11 +24,190 @@ MPU9255 imu; //imu object called, appropriately, imu
 #define FIGHT 2 //state of player's action
 #define END 3
 #define QUIT 4
+
+#define IDLE 10
+#define PLAYER_TURN 11
+#define MONSTER_TURN 12
+#define FIGHT_END 13
 unsigned long moveTimer;
 int randNumber;
 unsigned long buttonTimer; //timer to make sure multiple button presses do not occur
 Player me(&tft, player);
 Monster monster(5,10); // dummy monster
+class Fight{
+  Player *player;
+  Monster *monster;
+  TFT_eSPI *draw;
+  int fightState;
+  float critMultiplier = 0.5;
+    
+  public:
+  Fight(Player* player, Monster* monster, TFT_eSPI* tft_to_use){
+    this->player = player;
+    this->monster = monster;
+    draw = tft_to_use;
+    fightState = 10;
+  }
+
+  int getFightState() { return fightState; }
+
+  void setFightState(int fightState) { this->fightState = fightState; }
+  
+  void drawPlayerAttack(){
+     int period = 20;
+     draw->fillRect(5, 50, 20, 40, TFT_BLUE);
+     draw->fillRect(100, 50, 20, 40,TFT_RED);
+     draw->fillCircle(20, 54, 1, TFT_WHITE);
+     draw->fillCircle(103, 54, 1, TFT_PURPLE);
+     for (int i = 15; i < 97; i = i + 2){
+        int timer = millis();
+        draw->fillCircle(i, 70, 5,TFT_BLUE);
+        while (millis() - timer < period) {}
+        draw->fillCircle(i, 70, 5, TFT_BLACK);
+     }
+     draw->fillRect(5, 50, 20, 40, TFT_BLUE);
+     draw->fillRect(100, 50, 20, 40,TFT_RED);
+     draw->fillCircle(20, 54, 1, TFT_WHITE);
+     draw->fillCircle(103, 54, 1, TFT_PURPLE);
+  }
+
+  void drawMonsterAttack(){
+     int period = 20;
+     draw->fillRect(5, 50, 20, 40, TFT_BLUE);
+     draw->fillRect(100, 50, 20, 40,TFT_RED);
+     draw->fillCircle(20, 54, 1, TFT_WHITE);
+     draw->fillCircle(103, 54, 1, TFT_PURPLE);
+     for (int i = 110; i > 25; i= i - 2){
+        int timer = millis();
+        draw->fillCircle(i, 70, 5,TFT_RED);
+        while (millis() - timer < period) {}
+        draw->fillCircle(i, 70, 5, TFT_BLACK);
+     }
+     draw->fillRect(5, 50, 20, 40, TFT_BLUE);
+     draw->fillRect(100, 50, 20, 40,TFT_RED);
+     draw->fillCircle(20, 54, 1, TFT_WHITE);
+     draw->fillCircle(103, 54, 1, TFT_PURPLE);
+  }
+
+  void drawPlayerDeath(){
+     int period = 5;
+     for (int i = 5; i < 26; i= i + 2){
+        for (int j = 50; j < 91; j++){
+            int timer = millis();
+            draw->fillRect(i,j, 1,1, TFT_BLACK);
+            while (millis() - timer < period) {}
+            draw->fillRect(26-i+5,j, 1,1, TFT_BLACK);
+            while (millis() - timer < period) {}
+            draw->fillRect(i,91-j+50, 1,1, TFT_BLACK);
+            while (millis() - timer < period) {}
+            draw->fillRect(26-i+5,91-j+50, 1,1, TFT_BLACK);
+        }
+     }
+  }
+
+  void drawMonsterDeath(){
+    int period = 5;
+    for (int i = 101; i < 124; i= i + 2){
+        for (int j = 50; j < 91; j++){
+            int timer = millis();
+            draw->fillRect(i,j, 1,1, TFT_BLACK);
+            while (millis() - timer < period) {}
+            draw->fillRect(122-i+101,j, 1,1, TFT_BLACK);
+            while (millis() - timer < period) {}
+            draw->fillRect(i,91-j+50, 1,1, TFT_BLACK);
+            while (millis() - timer < period) {}
+            draw->fillRect(122-i+101,91-j+50, 1,1, TFT_BLACK);
+
+        }
+     }
+  }
+
+  int randomizeAttack(int attack) {
+    int randomNum = random(80, 120);
+    return int(attack * (randomNum / 100.0));
+  }
+
+  void drawHP() {
+    draw->setCursor(30, 20);
+    draw->println("                     ");
+    draw->setCursor(30, 20);
+    draw->printf("Player HP: %d", player->getHealth());
+    draw->setCursor(25, 110);
+    draw->println("                     ");
+    draw->setCursor(25, 110);
+    draw->printf("Monster HP: %d", monster->getHealth());
+  }
+
+  boolean startFight(Monster* monster) {
+    draw->fillScreen(TFT_BLACK);
+    draw->fillRect(5, 50, 20, 40, TFT_BLUE);
+    draw->fillRect(100, 50, 20, 40,TFT_RED);
+    draw->fillCircle(20, 54, 1, TFT_WHITE);
+    draw->fillCircle(103, 54, 1, TFT_PURPLE);
+    draw->setCursor(0,130);
+    draw->println("1: Attack");
+    draw->println("2: Forefeit");
+    drawHP();
+    while (fightState != FIGHT_END) {
+      switch (fightState) {
+        case IDLE:
+          {
+            fightState = PLAYER_TURN; // player goes first
+            break;
+          }
+        case PLAYER_TURN:
+          {
+            if (digitalRead(BUTTON_2) == 0 && millis() - buttonTimer > 500){
+                player->setHealth(0);
+                drawHP();
+            }
+            if (player->getHealth() > 0) { // player is alive
+              // <player attacks on button press>
+              // <insert button logic here>
+              int playerAttack = 100; // test damage
+              if (digitalRead(BUTTON_1) == 0 && millis() - buttonTimer > 500){
+                int randNumber = random(100);
+                if (randNumber < player->getLuck()) {
+                  playerAttack = ((1 + critMultiplier) * player->getPower());
+                } else {
+                  playerAttack = player->getPower();
+                }
+                drawPlayerAttack();
+                playerAttack = randomizeAttack(playerAttack);
+                monster->setHealth(monster->getHealth() - playerAttack);
+                fightState = MONSTER_TURN;
+                drawHP();
+              }
+            } else { // player is dead
+              drawPlayerDeath();
+              fightState = FIGHT_END;
+            }
+            break;
+          }
+        case MONSTER_TURN:
+          {
+            if (monster->getHealth() > 0) { // monster is alive
+              // monster responds automatically if alive
+              int monsterAttack = monster->getPower(); // test damage
+              monsterAttack = randomizeAttack(monsterAttack);
+              player->setHealth(player->getHealth() - monsterAttack);
+              fightState = PLAYER_TURN;
+              drawMonsterAttack();
+              drawHP();
+            } else { // monster is dead
+              fightState = FIGHT_END; 
+              drawMonsterDeath();
+            }
+            break;
+          }
+      }
+    } 
+    
+    fightState = IDLE;
+    // return true if player wins, false otherwise
+    return player->getHealth() > 0;
+  }
+};
 Fight fight(&me, &monster, &tft); // dummy fight
 
 void setup() {
@@ -97,8 +276,9 @@ void loop() {
           if (monster_info.at(0) == 'T') {
             tft.fillScreen(TFT_BLACK);
             state = FIGHT;
-            token_index = monster_info.substr(2).find(',');
-            remaining_info = monster_info.substr(token_index);
+            token_index = monster_info.find(',');
+            remaining_info = monster_info.substr(token_index+1);
+            Serial.println(remaining_info.c_str());
             token_index = remaining_info.find(',');
             monster.setHealth(atoi(remaining_info.substr(0,token_index).c_str()));
             monster.setPower(atoi(remaining_info.substr(token_index+1).c_str()));
@@ -120,7 +300,7 @@ string action(){
   switch(state){
     case START:
       tft.setCursor(0,0,1);
-      //tft.println("Welcome to the Game! Press button to continue.");
+      tft.println("Welcome to DEMMO! Press button to continue.");
       if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
           Serial.println("Button has been pressed, starting the game!");
           tft.fillScreen(TFT_BLACK);
