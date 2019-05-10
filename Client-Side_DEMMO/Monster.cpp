@@ -7,14 +7,10 @@ class Monster{
   private:
   int health;
   int power;
-  int gold;
-  boolean isBoss;
   public:
-  Monster(int health, int power, int gold, boolean isBoss){
+  Monster(int health, int power){
     this->health = health;
     this->power = power;
-    this->gold = gold;
-    this->isBoss = isBoss;
   }
   int getHealth(){
     return health;
@@ -24,11 +20,5 @@ class Monster{
   }
   int getPower(){
     return power;
-  }
-  int getGold(){
-    return gold;
-  }
-  boolean getMonsterStatus(){
-    return isBoss;
   }
 };

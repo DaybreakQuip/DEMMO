@@ -7,8 +7,6 @@
 #include <string>
 using std::string;
 #include "Player.cpp"
-#include "Monster.cpp"
-#include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 char network[] = "MIT";  //SSID for 6.08 Lab
 string player = "Ze";
@@ -23,9 +21,11 @@ MPU9255 imu; //imu object called, appropriately, imu
 #define MOVE 1 //state of player's action
 #define FIGHT 2 //state of player's action
 #define END 3
-unsigned long timer;
+#define QUIT 4
+unsigned long moveTimer;
 int randNumber;
-Player me(&tft);
+unsigned long buttonTimer; //timer to make sure multiple button presses do not occur
+Player me(&tft, player);
 
 void setup() {
   Serial.begin(115200); //for debugging if needed.
@@ -73,48 +73,75 @@ void setup() {
   me.drawMap(test_map);
   me.drawStats(player_stats);
   me.drawFlavorText(randNumber);
-  timer = millis();
+  moveTimer = millis();
+  buttonTimer = millis();
 }
 
 void loop() {
-    if (millis() - timer > 1500) {
+      if (digitalRead(BUTTON_2) && millis() - buttomTimer > 500 && state = MOVE){
+          state = QUIT;
+          buttonTimer = millis();
+      }
       string server_response = action();
       if (server_response.length() > 0){
           int token_index = server_response.find('|');
           string player_stats = server_response.substr(0, token_index);
           string test_map = server_response.substr(token_index + 1);
           randNumber = random(0, 11);
-          timer = millis();
+          moveTimer = millis();
           me.drawMap(test_map);
           me.drawStats(player_stats);
           me.drawFlavorText(randNumber);
-      }
     }
 }
 
 string action(){
   switch(state){
+    case START:
+      tft.drawString("Welcome to the Game! Press button to continue.");
+      if (digitalRead(BUTTON_1) && millis() - buttomTimer > 500){
+          state = MOVE;
+          return post_request(" ");
+      }
+      return "";
     case MOVE:
-      int LR = analogRead(ILR);
-      int UD = analogRead(IUD);
-      Serial.println(LR);
-      if (LR >= 3000){
-        return post_request("right");
-      }
-      else if (LR < 1000){
-       return post_request("left");
-      }
-      else if (UD >= 3000){
-       return post_request("down");
-      }
-      else if (UD < 1000){
-       return post_request("up");
-      }
-      else{
-        return "";
-      }
-      break;
-    case FIGHT:
-      break;
-    }
+        if (millis() - moveTimer > 1500) {
+          int LR = analogRead(ILR);
+          int UD = analogRead(IUD);
+          Serial.println(LR);
+          if (LR >= 3000){
+            return post_request(me.getPlayerName(), "right");
+          }
+          else if (LR < 1000){
+           return post_request(me.getPlayerName(),"left");
+    
+          }
+          else if (UD >= 3000){
+           return post_request(me.getPlayerName(),"down");
+          }
+          else if (UD < 1000){
+           return post_request(me.getPlayerName(),"up");
+          }
+          else{
+            return "";
+          }
+       }
+     case FIGHT:
+          return "";
+     case END:
+          state = START;
+          return "";
+     case QUIT:
+          if (digitalRead(BUTTON_1) && millis() - buttomTimer > 500){
+              state = START;
+              buttonTimer = millis();
+              
+          }
+          else if (digitalRead(BUTTON_1) && millis() - buttomTimer > 500){
+              state = MOVE;
+              buttonTimer = millis();
+          }
+          return "";
+  }
+        
 }
