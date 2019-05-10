@@ -12,7 +12,9 @@ char network[] = "MIT";  //SSID for 6.08 Lab
 string player = "Ze";
 //char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
 const uint8_t IUD = 32; //pin connected to button 
-const uint8_t ILR = 33; //pin connected to button 
+const uint8_t ILR = 33; //pin connected to button
+const uint8_t BUTTON_1 = 16; //button 1
+const uint8_t BUTTON_2 = 5; //button 2 
 int state = 0;
 MPU9255 imu; //imu object called, appropriately, imu
 #define START 0
@@ -27,6 +29,8 @@ void setup() {
   Serial.begin(115200); //for debugging if needed.
   pinMode(IUD, INPUT_PULLUP); //set input pin as an input!
   pinMode(ILR, INPUT_PULLUP); //set input pin as an input!
+  pinMode(BUTTON_1,INPUT_PULLUP);
+  pinMode(BUTTON_2,INPUT_PULLUP);
   tft.init();
   tft.setRotation(2);
   tft.setTextSize(1);

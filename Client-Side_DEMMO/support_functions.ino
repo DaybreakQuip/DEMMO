@@ -1,4 +1,4 @@
-string post_request(string action){
+string post_request(string player, string action){
   //Note to self, to convert integer to string: string boss = "Boss: " + string(itoa(numBossDefeated, buffer, 10));
   WiFiClient client;
   string body = "player_id=" + player + "&action=" + action;
