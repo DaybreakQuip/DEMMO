@@ -23,12 +23,24 @@ class Monster(GameObject):
         self.is_boss = is_boss
         self.defeated_by = defeated_by
 
+    def get_is_boss(self):
+        return self.is_boss
+
+    def get_defeated_by(self):
+        return self.defeated_by
+
+    def get_monster_stats(self):
+        """
+        :return: this monster's stats in sequence
+        """
+        return self.get_health(), self.get_power(), self.get_is_boss(), self.get_defeated_by()
+
     def inflictDamage(self, damage):
         """
         Damages the monster by a certain amount
         :param damage: the amount of damage dealt to the monster, must be > 0
         """
-        self.updateHealth(-damage)
+        self.update_health(-damage)
 
     def __str__(self, only_id=False):
         """

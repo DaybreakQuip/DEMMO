@@ -20,9 +20,10 @@ class Database:
 		Player table:
 			id: text
 			row: int
-			coL: int
+			col: int
 			health: int
 			power: int
+			luck: int
 			gold: int
 			num_bosses_defeated: int
 		Monster table:
@@ -37,14 +38,14 @@ class Database:
 		conn = sqlite3.connect(database)  # connect to that database (will create if it doesn't already exist)
 		c = conn.cursor()  # make cursor into database (allows us to execute commands)
 		c.execute(
-			'''CREATE TABLE IF NOT EXISTS player_table (id text, row int, col int, health int, power int, gold int, num_bosses_defeated int);''')  # run a CREATE TABLE command
+			'''CREATE TABLE IF NOT EXISTS player_table (id text, row int, col int, health int, power int, luck int, gold int, num_bosses_defeated int);''')  # run a CREATE TABLE command
 		c.execute(
 			'''CREATE TABLE IF NOT EXISTS monster_table (id text, row int, col int, health int, power int, is_boss text, defeated_by text);''')  # run a CREATE TABLE command
 		conn.commit()  # commit commands
 		conn.close()  # close connection to database
 
 	@classmethod
-	def create_or_update_player(cls, id, row, col, health, power, gold, num_bosses_defeated, database=db_constants.DATABASE_PATH):
+	def create_or_update_player(cls, id, row, col, health, power, luck, gold, num_bosses_defeated, database=db_constants.DATABASE_PATH):
 		"""
 		Updates a player entry in the player_table if the player exists or creates a new entry otherwise
 		:param id: (string) the player id to update or create
@@ -64,12 +65,12 @@ class Database:
 			'''SELECT EXISTS(SELECT 1 FROM player_table WHERE id = ?);''', (id, )).fetchone()[0]
 		if not player_exists: # Create a new player entry if the player does not exist
 			c.execute(
-				'''INSERT into player_table VALUES(?, ?, ?, ?, ?, ?, ?);''',
-				(id, row, col, health, power, gold, num_bosses_defeated))
+				'''INSERT into player_table VALUES(?, ?, ?, ?, ?, ?, ?, ?);''',
+				(id, row, col, health, power, luck, gold, num_bosses_defeated))
 		else: # Update the existing player if the player exists
 			c.execute(
-				'''UPDATE player_table SET row = ?, col = ?, health = ?, power = ?, gold = ?, num_bosses_defeated = ? WHERE id = ?;''',
-				(row, col, health, power, gold, num_bosses_defeated, id))
+				'''UPDATE player_table SET row = ?, col = ?, health = ?, power = ?, luck = ?, gold = ?, num_bosses_defeated = ? WHERE id = ?;''',
+				(row, col, health, power, luck, gold, num_bosses_defeated, id))
 
 		conn.commit()  # commit commands
 		conn.close()  # close connection to database
@@ -245,8 +246,8 @@ class Deserialize:
 		:param player_info: (tuple) of (id, row, col, health, power, gold, num_bosses_defeated)
 		:return: a new Player object
 		"""
-		id, row, col, health, power, gold, num_bosses_defeated = player_info
-		return Player(id, row, col, health, power, gold, num_bosses_defeated)
+		id, row, col, health, power, luck, gold, num_bosses_defeated = player_info
+		return Player(id, row, col, health, power, luck, gold, num_bosses_defeated)
 
 	@classmethod
 	def createMonsterObject(cls, monster_info):
@@ -322,7 +323,7 @@ class Serialize:
 		:return: None
 		"""
 		# if the player died, delete the player's entry from the database
-		if not player.isAlive:
+		if not player.is_alive:
 			Database.delete_player(player.id, database)
 			return
 
@@ -332,10 +333,11 @@ class Serialize:
 		col = player.col
 		health = player.health
 		power = player.power
+		luck = player.luck
 		gold = player.gold
 		num_bosses_defeated = player.num_boss_defeated
 
-		Database.create_or_update_player(id, row, col, health, power, gold, num_bosses_defeated, database)
+		Database.create_or_update_player(id, row, col, health, power, luck, gold, num_bosses_defeated, database)
 
 	@classmethod
 	def updateGameObjects(self, game_objects, database=db_constants.DATABASE_PATH):

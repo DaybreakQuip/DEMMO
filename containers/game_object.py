@@ -21,31 +21,31 @@ class GameObject():
         self.power = power
 
     @property
-    def isAlive(self):
+    def is_alive(self):
         """
         Returns whether the game object is alive or not
         """
         return self.health > 0
 
-    def getLocation(self):
+    def get_location(self):
         """
         :return: position of the game object with format (row, col)
         """
         return (self.row, self.col)
 
-    def getHealth(self):
+    def get_health(self):
         return self.health
 
-    def getPower(self):
+    def get_power(self):
         return self.power
 
-    def updateHealth(self, delta):
+    def update_health(self, delta):
         """
         Updates the game object's health by delta
         """
         self.health = max(0, self.health+delta)
 
-    def updatePower(self, delta):
+    def update_power(self, delta):
         """
         Updates the game object's power by delta
         """

@@ -9,6 +9,7 @@ class Player(GameObject):
                            col=constants.Player.DEFAULT_COL,
                            health=constants.Player.DEFAULT_HEALTH,
                            power=constants.Player.DEFAULT_POWER,
+                           luck = constants.Player.DEFAULT_LUCK,
                            gold=constants.Player.DEFAULT_GOLD,
                            num_boss_defeated=constants.Player.DEFAULT_BOSS_DEFEATED):
         """
@@ -23,6 +24,7 @@ class Player(GameObject):
         # TODO: Complete player class by adding more fields and adding methods to
         #       interact with a player
         super().__init__(id, row, col, health, power)
+        self.luck = luck
         self.gold = gold
         self.num_boss_defeated = num_boss_defeated
 
@@ -80,8 +82,17 @@ class Player(GameObject):
     def get_gold(self):
         return self.gold
 
+    def get_luck(self):
+        return self.luck
+
     def get_number_of_bosses_defeated(self):
         return self.num_boss_defeated
+
+    def get_player_stats(self):
+        """
+        :return: player stats
+        """
+        return self.get_health(), self.get_power(), self.get_luck(), self.get_gold(), self.get_number_of_bosses_defeated()
 
     def __str__(self, only_id=False):
         """
@@ -90,8 +101,8 @@ class Player(GameObject):
         if only_id:
             return self.id
 
-        return "(id: {}, health: {}, power: {}, gold: {}, bosses defeated: {})".format(
-            self.id, self.health, self.power, self.gold, self.num_boss_defeated
+        return "(id: {}, health: {}, power: {}, luck: {}, gold: {}, bosses defeated: {})".format(
+            self.id, self.health, self.power, self.luck, self.gold, self.num_boss_defeated
         )
 
 

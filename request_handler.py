@@ -4,6 +4,7 @@ sys.path.append('__HOME__/DEMMO')
 from database import Database, Serialize, Deserialize
 from containers.player import Player
 from containers.monster import Monster
+from response_creator import ResponseCreator
 
 def handle_get(request):
     """
@@ -13,11 +14,12 @@ def handle_get(request):
     :return: result from GET request
     """
     values = request.get('values', {})
-    # TODO: Catch exceptions
     option = values['option']
+
+    # Either display the server map or stats of a single player
     if option== "map":
         game = Deserialize.createGameFromDatabase()
-        return game.get_server_map()
+        return ResponseCreator(game).get_server_map()
     elif option == "player":
         player_id = values['id']
         player = Database.get_player_info(player_id)
@@ -50,8 +52,9 @@ def handle_post(request):
     # Update and store all game objects that have changed
     Serialize.updateGameObjects(changed_game_objects)
     game = Deserialize.createGameFromDatabase()
-    health, power, gold, bosses = game.get_player_stats(player_id)
-    return "{}, {}, {}, {},|{}".format(health, power, gold, bosses, game.get_surrounding_entities(player_id))
+
+    # Get and return the response for an action
+    return ResponseCreator(game).get_action_response(player_id)
 
 def request_handler(request=None):
     method = request.get("method")

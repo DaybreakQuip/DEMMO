@@ -3,7 +3,7 @@ sys.path.append('__HOME__/DEMMO')
 import server_path
 
 # Whether or not we are running __main__ in non-test.py files (e.g. database.py)
-TESTING = False
+TESTING = True
 # Whether or not this is the server
 IS_SERVER = True
 
@@ -16,6 +16,7 @@ class Player:
     DEFAULT_COL = 0
     DEFAULT_HEALTH = 5
     DEFAULT_POWER = 5
+    DEFAULT_LUCK = 5
     DEFAULT_GOLD = 0
     DEFAULT_BOSS_DEFEATED = 0
 
