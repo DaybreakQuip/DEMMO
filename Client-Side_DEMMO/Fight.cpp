@@ -2,6 +2,8 @@
 #include <SPI.h> //Used in support of TFT Display
 #include <string.h>  //used for some string handling and processing.
 #include <string>
+#include "Player.cpp"
+#include "Monster.cpp"
 using namespace std;
 
 #define IDLE 0
@@ -31,7 +33,7 @@ class Fight{
     switch (fightState) {
       case IDLE:
         {
-          
+          fightState = PLAYER_TURN; // player goes first
           break;
         }
       case PLAYER_TURN:
