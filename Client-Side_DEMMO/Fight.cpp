@@ -33,7 +33,6 @@ class Fight{
   void setFightState(int fightState) { this->fightState = fightState; }
   
   void drawPlayerAttack(){
-     draw->fillScreen(TFT_BLACK);
      int period = 20;
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
@@ -52,7 +51,6 @@ class Fight{
   }
 
   void drawMonsterAttack(){
-     draw->fillScreen(TFT_BLACK);
      int period = 20;
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
@@ -108,7 +106,20 @@ class Fight{
     return int(attack * (randomNum / 100.0));
   }
 
+  void drawHP() {
+    draw->setCursor(30, 20);
+    draw->println("                     ");
+    draw->setCursor(30, 20);
+    draw->printf("Player HP: %d", player->getHealth());
+    draw->setCursor(25, 110);
+    draw->println("                     ");
+    draw->setCursor(25, 110);
+    draw->printf("Monster HP: %d", monster->getHealth());
+  }
+
   boolean startFight(Monster* monster) {
+    draw->fillScreen(TFT_BLACK);
+    drawHP();
     while (fightState != FIGHT_END) {
       switch (fightState) {
         case IDLE:
@@ -132,6 +143,7 @@ class Fight{
               playerAttack = randomizeAttack(playerAttack);
               monster->setHealth(monster->getHealth() - playerAttack);
               fightState = MONSTER_TURN;
+              drawHP();
             } else { // player is dead
               drawPlayerDeath();
               fightState = FIGHT_END;
@@ -147,6 +159,7 @@ class Fight{
               player->setHealth(player->getHealth() - monsterAttack);
               fightState = PLAYER_TURN;
               drawMonsterAttack();
+              drawHP();
             } else { // monster is dead
               fightState = FIGHT_END; 
               drawMonsterDeath();
