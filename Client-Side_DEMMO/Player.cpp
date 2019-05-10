@@ -4,9 +4,10 @@
 #include <string>
 using namespace std;
 class Player{
-  public:
+  string playerName;
   int health = 5;
   int power = 5;
+  int luck = 5;
   int gold = 5;
   int numBossDefeated = 0;
    string explorationText[11] = {"You sit down to take a break.", "You feel as if something is watching you.",
@@ -14,9 +15,61 @@ class Player{
       "You fall asleep on the cold hard floor due to exhaustion.", "You thought you heard a monster. It was your stomach.", "A voice whispers: Give up.",
       "You found a dead body along your path.", "You try to dig through the dungeon with your weapon. It didn't work.", "You got up and tripped over yourself."};
   TFT_eSPI *draw;
-  Player(TFT_eSPI* tft_to_use){
+  
+  public:
+  Player(TFT_eSPI* tft_to_use, string playerName){
     draw = tft_to_use;
+    this->playerName = playerName;
   }
+
+  string getPlayerName() {
+    return playerName;
+  }
+
+  void setPlayerName(string playerName) {
+    this->playerName = playerName;
+  }
+
+  int getHealth() { 
+    return health; 
+  }
+  
+  void setHealth(int health) { 
+    this->health = health; 
+  }
+
+  int getPower() { 
+    return power; 
+  }
+
+  void setPower(int power) { 
+    this->power = power; 
+  }
+
+  int getLuck() { 
+    return luck; 
+  }
+
+  void setLuck() { 
+    this->luck = luck; 
+  }
+
+  int getGold() { 
+    return gold; 
+  }
+
+  void setGold() { 
+    this->gold = gold; 
+  }
+
+  int getNumBossDefeated() { 
+    return numBossDefeated; 
+  }
+
+  void setNumBossDefeated() { 
+    this->numBossDefeated = numBossDefeated; 
+  }
+  
   void drawMap(string player_map){
     const uint16_t BACKGROUND_COLOR = TFT_BLACK;
     const uint16_t MAP_OUTLINE_COLOR = TFT_WHITE;
@@ -57,6 +110,9 @@ class Player{
     power = atoi(playerStats.substr(0, token_index).c_str());
     playerStats = playerStats.substr(token_index+1);
     token_index = playerStats.find(',');
+    luck = atoi(playerStats.substr(0, token_index).c_str());
+    playerStats = playerStats.substr(token_index+1);
+    token_index = playerStats.find(',');
     gold = atoi(playerStats.substr(0, token_index).c_str());
     playerStats = playerStats.substr(token_index+1);
     token_index = playerStats.find(',');
@@ -71,7 +127,6 @@ class Player{
       } else if (i == 1) {
         draw->printf("HP:   %d", health);
       } else if (i == 2) {
-  
         draw->printf("PWR:  %d", power);
       } else if (i == 3) {
         draw->printf("Gold: %d", gold);
@@ -80,8 +135,8 @@ class Player{
       } 
     }
   }
+
   void drawFlavorText(int randomIndex){
-    
       // draw player options
       const int SQUARE_SIZE = 15;
       const int options_y = 3*SQUARE_SIZE + 10;
