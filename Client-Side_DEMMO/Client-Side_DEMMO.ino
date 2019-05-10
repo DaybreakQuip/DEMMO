@@ -115,12 +115,12 @@ void loop() {
 } 
 
 string action(){
-  Serial.print("state: ");
-  Serial.println(state);
+  //Serial.print("state: ");
+  //Serial.println(state);
   switch(state){
     case START:
       tft.setCursor(0,0,1);
-      tft.println("Welcome to the Game! Press button to continue.");
+      //tft.println("Welcome to the Game! Press button to continue.");
       if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
           Serial.println("Button has been pressed, starting the game!");
           tft.fillScreen(TFT_BLACK);
@@ -135,11 +135,11 @@ string action(){
       }
       return "";
     case MOVE:
-        Serial.println("Trying to move!");
+        //Serial.println("Trying to move!");
         if (millis() - moveTimer > 1500) {
           int LR = analogRead(ILR);
           int UD = analogRead(IUD);
-          Serial.println(LR);
+          //Serial.println(LR);
           if (LR >= 3000){
             return post_request(me.getPlayerName(), "right");
           }
@@ -163,8 +163,13 @@ string action(){
           {
             boolean playerWins = fight.startFight(&monster);
             Serial.print("player wins the fight? ");
-            Serial.println(playerWins);
-            string action = "fight_result&health=" + me.getHealth();
+            if (playerWins) {
+              Serial.println("yes");
+            } else {
+              Serial.println("no");
+            }
+            char buffer[20];
+            string action = "fight_result&health=" + string(itoa(me.getHealth(), buffer, 10));
             if (playerWins) {
                 string server_response = post_request(me.getPlayerName(), action);
                 int token_index = server_response.find('|');
