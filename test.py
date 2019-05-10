@@ -191,7 +191,6 @@ class TestAction(unittest.TestCase):
 
         self.assertEqual([('NotAMonster', 2, 1, 10, 1, 'False', '{}'), ('NotABoss', 0, 1, 10, 5, 'True', "{'NotZe'}")],
                          Database.get_all_monsters(test_database))
-        print(Database.get_all_players(test_database).__repr__())
         self.assertEqual([('MoveLeftWall', 3, 0, 1, 1000, 5, 0, 0), ('MoveRightWall', 1, 9, 2, 1, 999, 1, 100),
                           ('MoveUpWall', 0, 5, 3, 1000, 5, 0, 0), ('MoveDownWall', 9, 3, 4, 1000, 5, 0, 0),
                           ('MoveLeft', 3, 1, 5, 1000, 5, 0, 0), ('MoveRight', 1, 8, 6, 1, 999, 1, 100),
@@ -221,18 +220,21 @@ class TestGetSurroundings(unittest.TestCase):
             Player("Six", 1, 7, 1, 999, 1, 100),
             Player("Seven", 3, 5, 1000, 5, 0, 0),
             Player("Eight", 5, 3, 1000, 5, 0, 0),
+            Player("Nine", 0, 1, 1000, 5, 0, 0),
+            Player("Ten", 0, 1, 1000, 5, 0, 0)
         ]
         monsters = [
             Monster("NotAMonster", 2, 1, 10, 1, False, {}),
-            Monster("NotABoss", 0, 1, 10, 5, True, {"NotZe"}),
+            Monster("NotABoss", 0, 1, 10, 5, True, {"NotZe", "Ten"}),
             Monster("OnTopOfEight", 5, 3, 3, 3, True, {"One"})
         ]
         new_game = Game(10,10, players, monsters)
         response_creator = ResponseCreator(new_game)
         self.assertEqual("XX,__,M_,XX,_P,__,XX,_P,__,", response_creator.get_surrounding_entities("One"))
         self.assertEqual("__,__,__,__,_P,__,__,__,__,", response_creator.get_surrounding_entities("Seven"))
-
-        self.assertEqual("__,__,__,__,MP,__,__,__,__,", response_creator.get_surrounding_entities("Eight"))
+        self.assertEqual("XX,XX,XX,__,BP,__,__,__,__,", response_creator.get_surrounding_entities("Nine"))
+        self.assertEqual("XX,XX,XX,__,_P,__,__,__,__,", response_creator.get_surrounding_entities("Ten"))
+        self.assertEqual("__,__,__,__,BP,__,__,__,__,", response_creator.get_surrounding_entities("Eight"))
         game_objects = players + monsters
         Serialize.updateGameObjects(game_objects, test_database)
 

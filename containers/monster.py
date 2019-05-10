@@ -35,13 +35,6 @@ class Monster(GameObject):
         """
         return self.get_health(), self.get_power(), self.get_is_boss(), self.get_defeated_by()
 
-    def inflictDamage(self, damage):
-        """
-        Damages the monster by a certain amount
-        :param damage: the amount of damage dealt to the monster, must be > 0
-        """
-        self.update_health(-damage)
-
     def __str__(self, only_id=False):
         """
         :return: string representation of the game object
