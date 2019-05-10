@@ -123,6 +123,9 @@ class Game:
             raise ValueError("Error: New player health is less than 0")
         elif health > player.get_health():
             raise ValueError("Error: New player health cannot be greater than before")
+
+        if health > 0: # player won the fight!
+            player.num_boss_defeated += 1
         player.health = health  # passed checks, update player health
         changed_objects.append(player)
 
