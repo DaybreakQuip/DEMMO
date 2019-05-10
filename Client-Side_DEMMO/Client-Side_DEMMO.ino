@@ -80,33 +80,45 @@ void setup() {
 }
 
 void loop() {
-      if (digitalRead(BUTTON_2) && (millis() - buttonTimer > 500) && state == MOVE){
+      if (digitalRead(BUTTON_2)==0 && (millis() - buttonTimer > 500) && state == MOVE){
           state = QUIT;
           buttonTimer = millis();
       }
       string server_response = action();
+      Serial.print("server response: ");
+      Serial.println(server_response.c_str());
       if (server_response.length() > 0){
           int token_index = server_response.find('|');
           string player_stats = server_response.substr(0, token_index);
-          string test_map = server_response.substr(token_index + 1);
+          
+          string remaining_info = server_response.substr(token_index+1);
+          token_index = remaining_info.find(',');
+          
+          string test_map = remaining_info.substr(token_index + 1);
+          string monster_info = remaining_info.substr(token_index+1);
+         
           randNumber = random(0, 11);
           moveTimer = millis();
           me.drawMap(test_map);
           me.drawStats(player_stats);
           me.drawFlavorText(randNumber);
     }
-}
+} 
 
 string action(){
+  Serial.print("state: ");
+  Serial.println(state);
   switch(state){
     case START:
       tft.drawString("Welcome to the Game! Press button to continue.", 0, 0, 1);
-      if (digitalRead(BUTTON_1) && (millis() - buttonTimer > 500)){
+      if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
+          Serial.println("Button has been pressed, starting the game!");
           state = MOVE;
           return post_request(me.getPlayerName(), " ");
       }
       return "";
     case MOVE:
+        Serial.println("Trying to move!");
         if (millis() - moveTimer > 1500) {
           int LR = analogRead(ILR);
           int UD = analogRead(IUD);
@@ -124,16 +136,18 @@ string action(){
           else if (UD < 1000){
            return post_request(me.getPlayerName(),"up");
           }
-          else{
+          else {
             return "";
           }
+       } else {
+          return "";
        }
      case FIGHT:
           {
             Monster monster(5,10); // dummy monster
             Fight fight(&me, &monster, &tft); // dummy fight
             boolean playerWins = fight.startFight(&monster);
-            string action = "fight&health=" + me.getHealth();
+            string action = "fight_result&health=" + me.getHealth();
             if (playerWins) {
               // go to some state
             } else {
@@ -164,7 +178,7 @@ string post_request(string player, string action){
   WiFiClient client;
   string body = "player_id=" + player + "&action=" + action;
   if (client.connect("608dev.net", 80)) {
-    client.println("POST http://608dev.net/sandbox/sc/zehang/DEMMO/request_handler.py HTTP/1.1");
+    client.println("POST http://608dev.net/sandbox/sc/yanniw/DEMMO/request_handler.py HTTP/1.1");
     client.println("Host: 608dev.net");
     client.println("Content-Type: application/x-www-form-urlencoded");
     client.print("Content-Length: ");
