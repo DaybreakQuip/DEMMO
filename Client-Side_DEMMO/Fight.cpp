@@ -33,6 +33,7 @@ class Fight{
   void setFightState(int fightState) { this->fightState = fightState; }
   
   void drawPlayerAttack(){
+     draw->fillScreen(TFT_BLACK);
      int period = 20;
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
@@ -51,6 +52,7 @@ class Fight{
   }
 
   void drawMonsterAttack(){
+     draw->fillScreen(TFT_BLACK);
      int period = 20;
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
@@ -119,6 +121,7 @@ class Fight{
           if (player->getHealth() > 0) { // player is alive
             // <player attacks on button press>
             // <insert button logic here>
+            drawPlayerAttack();
             int playerAttack = 100; // test damage
             int randNumber = random(100);
             if (randNumber < player->getLuck()) {
@@ -133,6 +136,7 @@ class Fight{
             monster->setHealth(monster->getHealth() - playerAttack);
             fightState = MONSTER_TURN;
           } else { // player is dead
+            drawPlayerDeath();
             fightState = FIGHT_END;
           }
           break;
@@ -145,10 +149,11 @@ class Fight{
             monsterAttack = randomizeAttack(monsterAttack);
             Serial.print("Monster attack: ");
             Serial.println(monsterAttack);
-            
+            drawMonsterAttack();
             player->setHealth(player->getHealth() - monsterAttack);
             fightState = PLAYER_TURN;
           } else { // monster is dead
+            drawMonsterDeath();
             fightState = FIGHT_END; 
           }
           break;
