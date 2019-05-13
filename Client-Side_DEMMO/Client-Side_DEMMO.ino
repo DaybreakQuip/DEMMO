@@ -10,8 +10,10 @@ using std::string;
 #include "Monster.cpp"
 //#include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
-char network[] = "MIT";  //SSID for 6.08 Lab
-string player = "BOB";
+char network[] = "MIT";
+//char network[] = "6s08";  //SSID for 6.08 Lab
+string player = "Max";
+char password[] = "";
 //char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
 const uint8_t IUD = 32; //pin connected to button 
 const uint8_t ILR = 33; //pin connected to button
@@ -241,7 +243,7 @@ void setup() {
     Serial.println("Restarting");
     ESP.restart(); // restart the ESP (proper way)
   }
-  WiFi.begin(network);
+  WiFi.begin(network,password);
   uint8_t count = 0; //count used for Wifi check times
   Serial.print("Attempting to connect to ");
   Serial.println(network);
@@ -395,8 +397,15 @@ string action(){
               buttonTimer = millis();
               
           }
-          else if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
+          else if (digitalRead(BUTTON_2) == 0 && (millis() - buttonTimer > 500)){
               state = MOVE;
+              string server_response = post_request(me.getPlayerName(), " ");
+          int token_index = server_response.find('|');
+          string player_stats = server_response.substr(0, token_index);
+          string test_map = server_response.substr(token_index + 1);
+          me.drawMap(test_map);
+          me.drawStats(player_stats);
+          me.drawFlavorText(randNumber);
               buttonTimer = millis();
           }
           return "";
