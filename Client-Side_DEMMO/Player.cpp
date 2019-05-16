@@ -163,6 +163,20 @@ class Player{
   }
 
   void drawShopStats(){
+     for (int i = 0; i < 5; i++) {
+      draw->setCursor(30, i*10);
+      if (i == 0) {
+        draw->println("                 ");
+      } else if (i == 1) {
+        draw->printf("                  ");
+      } else if (i == 2) {
+        draw->printf("                  ");
+      } else if (i == 3) {
+        draw->printf("                  ");
+      } else if (i == 4) {
+        draw->printf("                  ");
+      }
+    }
       for (int i = 0; i < 5; i++) {
       draw->setCursor(30, i*10);
       if (i == 0) {

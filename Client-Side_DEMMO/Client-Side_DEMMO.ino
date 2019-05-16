@@ -15,6 +15,7 @@ char network[] = "MIT";
 //char network[] = "6s08";  //SSID for 6.08 Lab
 string player = "Max";
 //char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
+char password[] = "";
 const uint32_t pwm_channel = 0; 
 const uint8_t IUD = 32; //pin connected to button 
 const uint8_t ILR = 33; //pin connected to button
@@ -312,7 +313,14 @@ void setup() {
 }
 
 void loop() {
-      if (millis() - pwmTimer > 5000){
+      if (millis() - pwmTimer > 5000 && state != START){
+        if (state == previous_state){
+            previous_state = state;
+        }
+        state = OFF;
+        ledcWrite(pwm_channel, 0);
+      }
+      if (millis() - pwmTimer > 15000 && state == START){
         if (state == previous_state){
             previous_state = state;
         }
@@ -398,7 +406,14 @@ string action(){
   switch(state){
     case START:
       tft.setCursor(0,0,1);
-      tft.println("Welcome to DEMMO! Press button to continue.");
+      tft.println("...The last thing you recall is falling asleep with a strange game in your hand."); 
+      tft.println("");
+      tft.println("Out of the corner of your eye flashes an eerily familiar bright green sign:"); 
+      tft.println("");
+      tft.println("Welcome to DEMMO!");
+      tft.println("");
+      tft.println("Press button to continue.");
+      
       if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
           pwmTimer = millis();
           Serial.println("Button has been pressed, starting the game!");
@@ -550,7 +565,6 @@ string action(){
               tft.println();
               tft.println();
               tft.printf("1 Luck: %d Gold     ", int(pow(me.getLuck(),1.05)));
-              buttonTimer = millis();
 
           }
           if (buy_state == BUY_POWER){
@@ -566,8 +580,6 @@ string action(){
               tft.println();
               tft.setTextColor(TFT_GREEN, TFT_BLACK); 
               tft.printf("1 Luck: %d Gold     ", int(pow(me.getLuck(),1.05)));
-              buttonTimer = millis();
-
           }
           if (buy_state == BUY_LUCK){
               tft.setCursor(0, 50);
@@ -582,10 +594,8 @@ string action(){
               tft.setTextColor(TFT_GREEN, TFT_RED); 
               tft.printf("1 Luck: %d Gold     ", int(pow(me.getLuck(),1.05)));
               tft.setTextColor(TFT_GREEN, TFT_BLACK); 
-              buttonTimer = millis();
           }
-          if (digitalRead(BUTTON_1) == 0 && buttonTimer > 3000){
-              Serial.println(digitalRead(BUTTON_1));
+          if (digitalRead(BUTTON_1) == 0 && millis() - buttonTimer > 500){
               pwmTimer = millis();
               tft.setCursor(0, 110);
               switch(buy_state){
