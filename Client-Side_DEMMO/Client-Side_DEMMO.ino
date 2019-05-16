@@ -10,29 +10,31 @@ using std::string;
 #include "Monster.cpp"
 //#include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
-char network[] = "MIT";
-//char network[] = "6s08";  //SSID for 6.08 Lab
+//char network[] = "MIT";
+char network[] = "6s08";  //SSID for 6.08 Lab
 string player = "Max";
-char password[] = "";
-//char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
+char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
+const uint32_t pwm_channel = 0; 
 const uint8_t IUD = 32; //pin connected to button 
 const uint8_t ILR = 33; //pin connected to button
 const uint8_t BUTTON_1 = 16; //button 1
 const uint8_t BUTTON_2 = 5; //button 2 
 int state = 0;
+int previous_state = 0;
 MPU9255 imu; //imu object called, appropriately, imu
 #define START 0
 #define MOVE 1 //state of player's action
 #define FIGHT 2 //state of player's action
 #define END 3
 #define QUIT 4
-
+#define OFF 5
 #define IDLE 10
 #define PLAYER_TURN 11
 #define MONSTER_TURN 12
 #define FIGHT_END 13
 unsigned long moveTimer;
 int randNumber;
+int pwmTimer;
 unsigned long buttonTimer; //timer to make sure multiple button presses do not occur
 Player me(&tft, player);
 Monster monster(5,10); // dummy monster
@@ -170,36 +172,58 @@ class Fight{
           }
         case PLAYER_TURN:
           {
-            if (digitalRead(BUTTON_2) == 0 && millis() - buttonTimer > 500){
-                player->setHealth(0);
-                drawHP();
-            }
-            if (player->getHealth() > 0) { // player is alive
-              // <player attacks on button press>
-              // <insert button logic here>
-              int playerAttack = 100; // test damage
-              if (digitalRead(BUTTON_1) == 0 && millis() - buttonTimer > 500){
-                int randNumber = random(100);
-                if (randNumber < player->getLuck()) {
-                  playerAttack = ((1 + critMultiplier) * player->getPower());
-                } else {
-                  playerAttack = player->getPower();
-                }
-                drawPlayerAttack();
-                playerAttack = randomizeAttack(playerAttack);
-                monster->setHealth(monster->getHealth() - playerAttack);
-                fightState = MONSTER_TURN;
-                drawHP();
-                drawPlayerDamage(playerAttack);
+            if (millis() - pwmTimer > 5000){
+              if (state == previous_state){
+                  previous_state = state;
               }
-            } else { // player is dead
-              drawPlayerDeath();
-              fightState = FIGHT_END;
+              state = OFF;
+              ledcWrite(pwm_channel, 0);
+            }
+            if (state == OFF && digitalRead(BUTTON_1) == 0){
+                state = previous_state;
+                ledcWrite(pwm_channel,4095);
+                pwmTimer = millis();
+                buttonTimer = millis();
+            }
+            if (state != OFF){
+                if (digitalRead(BUTTON_2) == 0 && millis() - buttonTimer > 500){
+                    pwmTimer = millis();
+                    player->setHealth(0);
+                    drawHP();
+                    pwmTimer = millis();
+                }
+                if (player->getHealth() > 0) { // player is alive
+                  // <player attacks on button press>
+                  // <insert button logic here>
+                  int playerAttack = 100; // test damage
+                  if (digitalRead(BUTTON_1) == 0 && millis() - buttonTimer > 500){
+                    pwmTimer = millis();
+                    int randNumber = random(100);
+                    if (randNumber < player->getLuck()) {
+                      playerAttack = ((1 + critMultiplier) * player->getPower());
+                    } else {
+                      playerAttack = player->getPower();
+                    }
+                    drawPlayerAttack();
+                    playerAttack = randomizeAttack(playerAttack);
+                    monster->setHealth(monster->getHealth() - playerAttack);
+                    fightState = MONSTER_TURN;
+                    drawHP();
+                    drawPlayerDamage(playerAttack);
+                    pwmTimer = millis();
+                  }
+                } else { // player is dead
+                  pwmTimer = millis();
+                  drawPlayerDeath();
+                  fightState = FIGHT_END;
+                  pwmTimer = millis();
+                }
             }
             break;
           }
         case MONSTER_TURN:
           {
+            pwmTimer = millis();
             if (monster->getHealth() > 0) { // monster is alive
               // monster responds automatically if alive
               int monsterAttack = monster->getPower(); // test damage
@@ -209,9 +233,12 @@ class Fight{
               drawMonsterAttack();
               drawHP();
               drawMonsterDamage(monsterAttack);
+              pwmTimer = millis();
             } else { // monster is dead
+              pwmTimer = millis();
               fightState = FIGHT_END; 
               drawMonsterDeath();
+              pwmTimer = millis();
             }
             break;
           }
@@ -231,6 +258,9 @@ void setup() {
   pinMode(ILR, INPUT_PULLUP); //set input pin as an input!
   pinMode(BUTTON_1,INPUT_PULLUP);
   pinMode(BUTTON_2,INPUT_PULLUP);
+  ledcSetup(pwm_channel, 50, 12);//create pwm channel, @50 Hz, with 12 bits of precision
+  ledcAttachPin(14, pwm_channel); //link pwm channel to IO pin 14
+  pinMode(14, OUTPUT); //controlling TFT with hardware PWM (second part of lab)
   tft.init();
   tft.setRotation(2);
   tft.setTextSize(1);
@@ -266,47 +296,67 @@ void setup() {
   randNumber = random(0, 11);
   moveTimer = millis();
   buttonTimer = millis();
+  pwmTimer = millis();
+  ledcWrite(pwm_channel,4095);
 }
 
 void loop() {
-      if (digitalRead(BUTTON_2)==0 && (millis() - buttonTimer > 500) && state == MOVE){
-          state = QUIT;
-          tft.fillScreen(TFT_BLACK);
+      if (millis() - pwmTimer > 5000){
+        if (state == previous_state){
+            previous_state = state;
+        }
+        state = OFF;
+        ledcWrite(pwm_channel, 0);
+      }
+      if (state == OFF && digitalRead(BUTTON_1) == 0){
+          state = previous_state;
+          ledcWrite(pwm_channel,4095);
+          pwmTimer = millis();
           buttonTimer = millis();
       }
-      string server_response = action();
-      if (server_response.length() > 0){
-          Serial.print("server response: ");
-          Serial.println(server_response.c_str());
-        
-          int token_index = server_response.find('|');
-          string player_stats = server_response.substr(0, token_index);
-          
-          string remaining_info = server_response.substr(token_index+1);
-          token_index = remaining_info.find('|');
-          
-          string test_map = remaining_info.substr(0, token_index);
-          string monster_info = remaining_info.substr(token_index+1);
-
-          if (monster_info.at(0) == 'T') {
-            tft.fillScreen(TFT_BLACK);
-            state = FIGHT;
-            token_index = monster_info.find(',');
-            remaining_info = monster_info.substr(token_index+1);
-            Serial.println(remaining_info.c_str());
-            token_index = remaining_info.find(',');
-            monster.setHealth(atoi(remaining_info.substr(0,token_index).c_str()));
-            monster.setPower(atoi(remaining_info.substr(token_index+1).c_str()));
-          } else {
-            Serial.println("no monster");
+      if (state != OFF){
+          if (digitalRead(BUTTON_2)==0 && (millis() - buttonTimer > 500) && state == MOVE){
+              state = QUIT;
+              previous_state = state;
+              tft.fillScreen(TFT_BLACK);
+              buttonTimer = millis();
           }
-          
-          randNumber = random(0, 11);
-          moveTimer = millis();
-          me.drawMap(test_map);
-          me.drawStats(player_stats);
-          me.drawFlavorText(randNumber);
-    }
+          string server_response = action();
+          if (server_response.length() > 0){
+              pwmTimer = millis();
+              Serial.print("server response: ");
+              Serial.println(server_response.c_str());
+            
+              int token_index = server_response.find('|');
+              string player_stats = server_response.substr(0, token_index);
+              
+              string remaining_info = server_response.substr(token_index+1);
+              token_index = remaining_info.find('|');
+              
+              string test_map = remaining_info.substr(0, token_index);
+              string monster_info = remaining_info.substr(token_index+1);
+    
+              if (monster_info.at(0) == 'T') {
+                tft.fillScreen(TFT_BLACK);
+                state = FIGHT;
+                previous_state = state;
+                token_index = monster_info.find(',');
+                remaining_info = monster_info.substr(token_index+1);
+                Serial.println(remaining_info.c_str());
+                token_index = remaining_info.find(',');
+                monster.setHealth(atoi(remaining_info.substr(0,token_index).c_str()));
+                monster.setPower(atoi(remaining_info.substr(token_index+1).c_str()));
+              } else {
+                Serial.println("no monster");
+              }
+              
+              randNumber = random(0, 11);
+              moveTimer = millis();
+              me.drawMap(test_map);
+              me.drawStats(player_stats);
+              me.drawFlavorText(randNumber);
+        }
+     }
 } 
 
 string action(){
@@ -327,6 +377,7 @@ string action(){
           me.drawStats(player_stats);
           me.drawFlavorText(randNumber);
           state = MOVE;
+          previous_state = state;
       }
       return "";
     case MOVE:
@@ -357,6 +408,7 @@ string action(){
      case FIGHT:
           {
             boolean playerWins = fight.startFight(&monster);
+            pwmTimer = millis();
             Serial.print("player wins the fight? ");
             if (playerWins) {
               Serial.println("yes");
@@ -367,6 +419,7 @@ string action(){
             string action = "fight_result&health=" + string(itoa(me.getHealth(), buffer, 10));
             Serial.println(action.c_str());
             string server_response = post_request(me.getPlayerName(), action);
+            pwmTimer = millis();
             if (playerWins) {
                 int token_index = server_response.find('|');
                 string player_stats = server_response.substr(0, token_index);
@@ -375,9 +428,12 @@ string action(){
                 me.drawStats(player_stats);
                 me.drawFlavorText(randNumber);
                 state = MOVE;
+                previous_state = state;
+
             } else {
               tft.fillScreen(TFT_BLACK);
               state = END;
+              previous_state = state;
             }
             return "";
           }
@@ -385,6 +441,7 @@ string action(){
           tft.drawString("yOu LoSt!", 0, 0, 1);
           if (digitalRead(BUTTON_1) == 0 && millis() - buttonTimer > 500){
              state = START;
+             previous_state = state;
              tft.fillScreen(TFT_BLACK);
              buttonTimer = millis();
           }
@@ -394,11 +451,13 @@ string action(){
             tft.println("Do you want to quit?");
           if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
               state = START;
+              previous_state = state;
               buttonTimer = millis();
               
           }
           else if (digitalRead(BUTTON_2) == 0 && (millis() - buttonTimer > 500)){
               state = MOVE;
+              previous_state = state;
               string server_response = post_request(me.getPlayerName(), " ");
           int token_index = server_response.find('|');
           string player_stats = server_response.substr(0, token_index);
