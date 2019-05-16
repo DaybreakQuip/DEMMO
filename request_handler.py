@@ -43,7 +43,9 @@ def handle_post(request):
     game = Deserialize.createGameFromDatabase()
     # If the player_id does not exist, create a new player and add it to the game
     if player_id not in game.id_to_players:
-        player = Player(player_id)
+        # check if a record for the player exists already
+        player = Player(player_id,
+                        num_boss_defeated=Deserialize.getNumBossesDefeated(player_id))
         game.add_player(player)
         changed_game_objects.append(player)
 

@@ -5,6 +5,7 @@
 #include <mpu9255_esp32.h>
 #include <HTTPClient.h>
 #include <string>
+#include <math.h>
 using std::string;
 #include "Player.cpp"
 #include "Monster.cpp"
@@ -20,8 +21,12 @@ const uint8_t IUD = 32; //pin connected to button
 const uint8_t ILR = 33; //pin connected to button
 const uint8_t BUTTON_1 = 16; //button 1
 const uint8_t BUTTON_2 = 5; //button 2 
+const int SQUARE_SIZE = 15;
+const int options_y = 3*SQUARE_SIZE + 20;
+const uint16_t OPTIONS_COLOR = TFT_YELLOW;
 int state = 0;
 int previous_state = 0;
+int buy_state = 20;
 MPU9255 imu; //imu object called, appropriately, imu
 #define START 0
 #define MOVE 1 //state of player's action
@@ -29,10 +34,16 @@ MPU9255 imu; //imu object called, appropriately, imu
 #define END 3
 #define QUIT 4
 #define OFF 5
+#define CHOOSE_QUIT 6
+#define CHOOSE_BUY 7
+#define BUY 8
 #define IDLE 10
 #define PLAYER_TURN 11
 #define MONSTER_TURN 12
 #define FIGHT_END 13
+#define BUY_HEALTH 20
+#define BUY_POWER 21
+#define BUY_LUCK 22
 unsigned long moveTimer;
 int randNumber;
 int pwmTimer;
@@ -62,7 +73,7 @@ class Fight{
      int period = 20;
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
-     draw->fillCircle(20, 54, 1, TFT_WHITE);
+     draw->fillCircle(20, 54, 1, TFT_RED);
      draw->fillCircle(103, 54, 1, TFT_PURPLE);
      for (int i = 15; i < 97; i = i + 2){
         int timer = millis();
@@ -72,7 +83,7 @@ class Fight{
      }
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
-     draw->fillCircle(20, 54, 1, TFT_WHITE);
+     draw->fillCircle(20, 54, 1, TFT_RED);
      draw->fillCircle(103, 54, 1, TFT_PURPLE);
   }
 
@@ -80,7 +91,7 @@ class Fight{
      int period = 20;
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
-     draw->fillCircle(20, 54, 1, TFT_WHITE);
+     draw->fillCircle(20, 54, 1, TFT_RED);
      draw->fillCircle(103, 54, 1, TFT_PURPLE);
      for (int i = 110; i > 25; i= i - 2){
         int timer = millis();
@@ -90,7 +101,7 @@ class Fight{
      }
      draw->fillRect(5, 50, 20, 40, TFT_BLUE);
      draw->fillRect(100, 50, 20, 40,TFT_RED);
-     draw->fillCircle(20, 54, 1, TFT_WHITE);
+     draw->fillCircle(20, 54, 1, TFT_RED);
      draw->fillCircle(103, 54, 1, TFT_PURPLE);
   }
 
@@ -158,7 +169,7 @@ class Fight{
     draw->fillScreen(TFT_BLACK);
     draw->fillRect(5, 50, 20, 40, TFT_BLUE);
     draw->fillRect(100, 50, 20, 40,TFT_RED);
-    draw->fillCircle(20, 54, 1, TFT_WHITE);
+    draw->fillCircle(20, 54, 1, TFT_RED);
     draw->fillCircle(103, 54, 1, TFT_PURPLE);
     draw->setCursor(0,140);
     draw->println("1: Attack");
@@ -274,7 +285,7 @@ void setup() {
     Serial.println("Restarting");
     ESP.restart(); // restart the ESP (proper way)
   }
-  WiFi.begin(network,password);
+  WiFi.begin(network);
   uint8_t count = 0; //count used for Wifi check times
   Serial.print("Attempting to connect to ");
   Serial.println(network);
@@ -302,7 +313,14 @@ void setup() {
 }
 
 void loop() {
-      if (millis() - pwmTimer > 5000){
+      if (millis() - pwmTimer > 5000 && state != START){
+        if (state == previous_state){
+            previous_state = state;
+        }
+        state = OFF;
+        ledcWrite(pwm_channel, 0);
+      }
+      if (millis() - pwmTimer > 15000 && state == START){
         if (state == previous_state){
             previous_state = state;
         }
@@ -317,10 +335,32 @@ void loop() {
       }
       if (state != OFF){
           if (digitalRead(BUTTON_2)==0 && (millis() - buttonTimer > 500) && state == MOVE){
-              state = QUIT;
+              pwmTimer = millis();
+              state = CHOOSE_QUIT;
               previous_state = state;
-              tft.fillScreen(TFT_BLACK);
+              tft.drawRect(10, options_y, 105, 20, OPTIONS_COLOR);
+              tft.setCursor(30, options_y + 6);
+              tft.print("BUY");
+              tft.print("    ");
+              tft.setTextColor(TFT_GREEN, TFT_RED); 
+              tft.print("QUIT");
+              tft.setTextColor(TFT_GREEN, TFT_BLACK); 
               buttonTimer = millis();
+              pwmTimer = millis();
+          }
+          if (digitalRead(BUTTON_1)==0 && (millis() - buttonTimer > 500) && state == MOVE){
+              pwmTimer = millis();
+              state = CHOOSE_BUY;
+              previous_state = state;
+              tft.drawRect(10, options_y, 105, 20, OPTIONS_COLOR);
+              tft.setCursor(30, options_y + 6);
+              tft.setTextColor(TFT_GREEN, TFT_RED); 
+              tft.print("BUY");
+              tft.setTextColor(TFT_GREEN, TFT_BLACK); 
+              tft.print("    ");
+              tft.print("QUIT");
+              buttonTimer = millis();
+              pwmTimer = millis();
           }
           string server_response = action();
           if (server_response.length() > 0){
@@ -375,6 +415,7 @@ string action(){
       tft.println("Press button to continue.");
       
       if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
+          pwmTimer = millis();
           Serial.println("Button has been pressed, starting the game!");
           tft.fillScreen(TFT_BLACK);
           string server_response = post_request(me.getPlayerName(), " ");
@@ -448,33 +489,209 @@ string action(){
      case END:
           tft.drawString("yOu LoSt!", 0, 0, 1);
           if (digitalRead(BUTTON_1) == 0 && millis() - buttonTimer > 500){
+             pwmTimer = millis();
              state = START;
              previous_state = state;
              tft.fillScreen(TFT_BLACK);
              buttonTimer = millis();
           }
           return "";
-     case QUIT:
-           tft.setCursor(0,0,1);
-            tft.println("Do you want to quit?");
-          if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
-              state = START;
+     case CHOOSE_BUY:
+           if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
+              pwmTimer = millis();
+              state = BUY;
               previous_state = state;
-              buttonTimer = millis();
-              
+              tft.fillScreen(TFT_BLACK);
+              me.drawShopStats();
+              buttonTimer = millis(); 
+
           }
           else if (digitalRead(BUTTON_2) == 0 && (millis() - buttonTimer > 500)){
+              pwmTimer = millis();
               state = MOVE;
               previous_state = state;
               string server_response = post_request(me.getPlayerName(), " ");
-          int token_index = server_response.find('|');
-          string player_stats = server_response.substr(0, token_index);
-          string test_map = server_response.substr(token_index + 1);
-          me.drawMap(test_map);
-          me.drawStats(player_stats);
-          me.drawFlavorText(randNumber);
+              int token_index = server_response.find('|');
+              string player_stats = server_response.substr(0, token_index);
+              string test_map = server_response.substr(token_index + 1);
+              me.drawMap(test_map);
+              me.drawStats(player_stats);
+              me.drawFlavorText(randNumber);
               buttonTimer = millis();
           }
+          return "";
+     case BUY:
+          if (millis() - moveTimer > 300){
+              int UD = analogRead(IUD);
+              if (UD >= 3000){
+                  pwmTimer = millis();
+                  tft.setCursor(0,110);
+                  tft.println("                               ");
+                  if (buy_state == BUY_HEALTH){
+                      buy_state = BUY_POWER;
+                  }
+                  else if (buy_state == BUY_POWER){
+                      buy_state = BUY_LUCK;
+                  }
+                  else if (buy_state == BUY_LUCK){
+                      buy_state = BUY_HEALTH;
+                  }
+              }
+              else if (UD < 1000){
+                  pwmTimer = millis();
+                  tft.setCursor(0,110);
+                  tft.println("                               ");
+                  if (buy_state == BUY_HEALTH){
+                      buy_state = BUY_LUCK;
+                  }
+                  else if (buy_state == BUY_POWER){
+                      buy_state = BUY_HEALTH;
+                  }
+                  else if (buy_state == BUY_LUCK){
+                      buy_state = BUY_POWER;
+                  }
+              }
+             moveTimer = millis();
+          }
+          if (buy_state == BUY_HEALTH){
+              tft.setCursor(0, 50);
+              tft.println();
+              tft.setTextColor(TFT_GREEN, TFT_RED); 
+              tft.printf("5 HP:   %d Gold     ", int(pow(me.getHealth(),1.05)));
+              tft.println();
+              tft.println();
+              tft.setTextColor(TFT_GREEN, TFT_BLACK); 
+              tft.printf("1 PWR:  %d Gold     ", int(pow(me.getPower(),1.05)));
+              tft.println();
+              tft.println();
+              tft.printf("1 Luck: %d Gold     ", int(pow(me.getLuck(),1.05)));
+
+          }
+          if (buy_state == BUY_POWER){
+              tft.setCursor(0, 50);
+              tft.println();
+              tft.setTextColor(TFT_GREEN, TFT_BLACK); 
+              tft.printf("5 HP:   %d Gold     ", int(pow(me.getHealth(),1.05)));
+              tft.println();
+              tft.println();
+              tft.setTextColor(TFT_GREEN, TFT_RED); 
+              tft.printf("1 PWR:  %d Gold     ", int(pow(me.getPower(),1.05)));
+              tft.println();
+              tft.println();
+              tft.setTextColor(TFT_GREEN, TFT_BLACK); 
+              tft.printf("1 Luck: %d Gold     ", int(pow(me.getLuck(),1.05)));
+          }
+          if (buy_state == BUY_LUCK){
+              tft.setCursor(0, 50);
+              tft.println();
+              tft.setTextColor(TFT_GREEN, TFT_BLACK); 
+              tft.printf("5 HP:   %d Gold     ", int(pow(me.getHealth(),1.05)));
+              tft.println();
+              tft.println();
+              tft.printf("1 PWR:  %d Gold     ", int(pow(me.getPower(),1.05)));
+              tft.println();
+              tft.println();
+              tft.setTextColor(TFT_GREEN, TFT_RED); 
+              tft.printf("1 Luck: %d Gold     ", int(pow(me.getLuck(),1.05)));
+              tft.setTextColor(TFT_GREEN, TFT_BLACK); 
+          }
+          if (digitalRead(BUTTON_1) == 0 && millis() - buttonTimer > 500){
+              pwmTimer = millis();
+              tft.setCursor(0, 110);
+              switch(buy_state){
+                  case BUY_HEALTH:
+                    if (me.getGold() < int(pow(me.getHealth(),1.05))){
+                        tft.println("Not enough gold!");
+                    }
+                    else{
+                        //send a post request
+                        string server_response = post_request(me.getPlayerName(), "buy&stat=health");
+                        int token_index = server_response.find('|');
+                        string player_stats = server_response.substr(0, token_index);
+                        string test_map = server_response.substr(token_index + 1);
+                        me.setStats(player_stats);
+                        me.drawShopStats();
+                        tft.setCursor(0, 110);                        
+                        tft.println("Success!");
+                    }
+                    break;
+                  case BUY_POWER:
+                       if (me.getGold() < int(pow(me.getPower(),1.05))){
+                        tft.println("Not enough gold!");
+                    }
+                    else{
+                        //send a post request
+                        string server_response = post_request(me.getPlayerName(), "buy&stat=power");
+                        int token_index = server_response.find('|');
+                        string player_stats = server_response.substr(0, token_index);
+                        string test_map = server_response.substr(token_index + 1);
+                        me.setStats(player_stats);
+                        me.drawShopStats();
+                        tft.setCursor(0, 110);
+                        tft.println("Success!");
+                    }
+                    break;
+                  case BUY_LUCK:
+                    if (me.getGold() < int(pow(me.getLuck(),1.05))){
+                        tft.println("Not enough gold!");
+                    }
+                    else{
+                        //send a post request
+                        string server_response = post_request(me.getPlayerName(), "buy&stat=luck");
+                        int token_index = server_response.find('|');
+                        string player_stats = server_response.substr(0, token_index);
+                        string test_map = server_response.substr(token_index + 1);
+                        me.setStats(player_stats);
+                        me.drawShopStats();
+                        tft.setCursor(0, 110);
+                        tft.println("Success!");
+                    }
+                    break;
+              }
+              buttonTimer = millis();
+          }
+          if (digitalRead(BUTTON_2) == 0){
+              state = MOVE;
+              previous_state = state;
+              pwmTimer = millis();
+              string server_response = post_request(me.getPlayerName(), " ");
+              int token_index = server_response.find('|');
+              string player_stats = server_response.substr(0, token_index);
+              string test_map = server_response.substr(token_index + 1);
+              me.drawMap(test_map);
+              me.drawStats(player_stats);
+              me.drawFlavorText(randNumber);
+              buttonTimer = millis();
+          }
+          return "";
+     case CHOOSE_QUIT:
+          if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
+              pwmTimer = millis();
+              state = QUIT;
+              previous_state = state;
+              tft.fillScreen(TFT_BLACK);
+              buttonTimer = millis(); 
+          }
+          else if (digitalRead(BUTTON_2) == 0 && (millis() - buttonTimer > 500)){
+              pwmTimer = millis();
+              state = MOVE;
+              previous_state = state;
+              string server_response = post_request(me.getPlayerName(), " ");
+              int token_index = server_response.find('|');
+              string player_stats = server_response.substr(0, token_index);
+              string test_map = server_response.substr(token_index + 1);
+              me.drawMap(test_map);
+              me.drawStats(player_stats);
+              me.drawFlavorText(randNumber);
+              buttonTimer = millis();
+          }
+          return "";
+     case QUIT:
+          pwmTimer = millis();
+          state = START;
+          previous_state = state;
+          buttonTimer = millis();
+          tft.fillScreen(TFT_BLACK);
           return "";
   }
         
