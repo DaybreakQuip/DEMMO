@@ -24,10 +24,11 @@ class Monster(GameObject):
         self.defeated_by = defeated_by
 
     def get_gold(self):
+        base_gold = (self.health + self.power) * 5
         if self.is_boss:
-            return 2 * self.health + self.power
+            return 2 * base_gold
         else:
-            return self.health + self.power
+            return base_gold
 
     def get_is_boss(self):
         return self.is_boss

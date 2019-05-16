@@ -58,6 +58,16 @@ class Game:
     LEFT        = "left"
     RIGHT       = "right"
     FIGHT_RESULT = "fight_result"
+    BUY = "buy"
+    STATE = "stat"
+    HEALTH = "health"
+    POWER = "power"
+    LUCK = "luck"
+
+    SHOP_EXPONENT = 1.05
+    HEALTH_INCREASE = 5
+    POWER_INCREASE = 1
+    LUCK_INCREASE = 1
 
     class ServerMap:
         DIVIDER_MULTIPLIER = 4 # Determines size of the divider -> larger number = longer divider

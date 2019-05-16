@@ -112,6 +112,15 @@ class Game:
         elif action == constants.Game.FIGHT_RESULT:
             health = int(kwargs['health'])
             changed_objects.extend(self.process_fight_result(player, health))
+        elif action == constants.Game.BUY:
+            stat = kwargs['stat']
+            if stat == constants.Game.HEALTH:
+                player.buy_health()
+            elif stat == constants.Game.POWER:
+                player.buy_power()
+            elif stat == constants.Game.LUCK:
+                player.buy_luck()
+            changed_objects.append(player)
 
         return changed_objects
 
@@ -130,6 +139,7 @@ class Game:
                     return [] # Cannot defeat the same boss again!
                 monster.defeated_by.add(player_id)
                 player.num_boss_defeated += 1
+            # TODO: Delete this
             player.gold += monster.get_gold()
 
         player.health = health  # passed checks, update player health

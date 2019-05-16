@@ -30,19 +30,39 @@ class Player(GameObject):
 
     def buy_health(self):
         """
-        Increases player health by 1 if the player has enough gold to purchase more health
+        Increases player health by 5 if the player has enough gold to purchase more health
         :return: true if the purchase was successful and false otherwise
         """
-        # TODO: Increase player health by 1 if the player has enough gold to purchase the health
-        pass
+        cost = int(pow(self.health, constants.Game.SHOP_EXPONENT))
+        if self.gold >= cost:
+            self.gold -= cost
+            self.health += constants.Game.HEALTH_INCREASE
+            return True
+        return False
 
     def buy_power(self):
         """
         Increases player power by 1 if the player has enough gold to purchase more health
-        :return: true if hte purchase was successful and false otherwise
+        :return: true if the purchase was successful and false otherwise
         """
-        # TODO: Increase player power by 1 if hte player has enough gold to purchase the health
-        pass
+        cost = int(pow(self.power, constants.Game.SHOP_EXPONENT))
+        if self.gold >= cost:
+            self.gold -= cost
+            self.power += constants.Game.POWER_INCREASE
+            return True
+        return False
+
+    def buy_luck(self):
+        """
+        Increases player luck by 1 if the player has enough gold to purchase more luck
+        :return: true if the purchase was successful and false otherwise
+        """
+        cost = int(pow(self.power, constants.Game.SHOP_EXPONENT))
+        if self.gold >= cost:
+            self.gold -= cost
+            self.luck += constants.Game.LUCK_INCREASE
+            return True
+        return False
 
     def move_up(self):
         """
