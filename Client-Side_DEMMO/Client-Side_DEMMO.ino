@@ -557,14 +557,14 @@ string action(){
               tft.setCursor(0, 50);
               tft.println();
               tft.setTextColor(TFT_GREEN, TFT_RED); 
-              tft.printf("10 HP:   %d Gold     ", int(pow(me.getHealth(),1.02)));
+              tft.printf("5 HP:   %d Gold     ", int(pow(me.getHealth(),1.02)));
               tft.println();
               tft.println();
               tft.setTextColor(TFT_GREEN, TFT_BLACK); 
-              tft.printf("1 PWR:   %d Gold     ", int(pow(me.getPower(),1.05)));
+              tft.printf("1 PWR:  %d Gold     ", int(pow(me.getPower(),1.05)));
               tft.println();
               tft.println();
-              tft.printf("1 Luck:  %d Gold     ", int(pow(me.getLuck(),1.05)));
+              tft.printf("1 Luck: %d Gold     ", int(pow(me.getLuck(),1.05)));
 
           }
           if (buy_state == BUY_POWER){
