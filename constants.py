@@ -65,7 +65,7 @@ class Game:
     LUCK = "luck"
 
     SHOP_EXPONENT = 1.05
-    HEALTH_INCREASE = 5
+    HEALTH_INCREASE = 10
     POWER_INCREASE = 1
     LUCK_INCREASE = 1
 
