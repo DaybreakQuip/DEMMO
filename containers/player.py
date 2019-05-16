@@ -57,7 +57,7 @@ class Player(GameObject):
         Increases player luck by 1 if the player has enough gold to purchase more luck
         :return: true if the purchase was successful and false otherwise
         """
-        cost = int(pow(self.power, constants.Game.SHOP_EXPONENT))
+        cost = int(pow(self.luck, constants.Game.SHOP_EXPONENT))
         if self.gold >= cost:
             self.gold -= cost
             self.luck += constants.Game.LUCK_INCREASE
