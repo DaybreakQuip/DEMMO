@@ -17,6 +17,8 @@ class Database:
 	@classmethod
 	def create_game_object_tables(cls, database=db_constants.DATABASE_PATH):
 		'''
+		Record table:
+			num_bosses_defeated: int
 		Player table:
 			id: text
 			row: int
@@ -25,7 +27,6 @@ class Database:
 			power: int
 			luck: int
 			gold: int
-			num_bosses_defeated: int
 		Monster table:
 			id: text
 			row: int
@@ -38,7 +39,9 @@ class Database:
 		conn = sqlite3.connect(database)  # connect to that database (will create if it doesn't already exist)
 		c = conn.cursor()  # make cursor into database (allows us to execute commands)
 		c.execute(
-			'''CREATE TABLE IF NOT EXISTS player_table (id text, row int, col int, health int, power int, luck int, gold int, num_bosses_defeated int);''')  # run a CREATE TABLE command
+			'''CREATE TABLE IF NOT EXISTS record_table (id text, num_bosses_defeated int);''') # run a CREATE TABLE command
+		c.execute(
+			'''CREATE TABLE IF NOT EXISTS player_table (id text, row int, col int, health int, power int, luck int, gold int);''')  # run a CREATE TABLE command
 		c.execute(
 			'''CREATE TABLE IF NOT EXISTS monster_table (id text, row int, col int, health int, power int, is_boss text, defeated_by text);''')  # run a CREATE TABLE command
 		conn.commit()  # commit commands
@@ -65,12 +68,26 @@ class Database:
 			'''SELECT EXISTS(SELECT 1 FROM player_table WHERE id = ?);''', (id, )).fetchone()[0]
 		if not player_exists: # Create a new player entry if the player does not exist
 			c.execute(
-				'''INSERT into player_table VALUES(?, ?, ?, ?, ?, ?, ?, ?);''',
-				(id, row, col, health, power, luck, gold, num_bosses_defeated))
+				'''INSERT into player_table VALUES(?, ?, ?, ?, ?, ?, ?);''',
+				(id, row, col, health, power, luck, gold))
 		else: # Update the existing player if the player exists
 			c.execute(
-				'''UPDATE player_table SET row = ?, col = ?, health = ?, power = ?, luck = ?, gold = ?, num_bosses_defeated = ? WHERE id = ?;''',
-				(row, col, health, power, luck, gold, num_bosses_defeated, id))
+				'''UPDATE player_table SET row = ?, col = ?, health = ?, power = ?, luck = ?, gold = ? WHERE id = ?;''',
+				(row, col, health, power, luck, gold, id))
+
+		# Determine whether a record exists for the player
+		record_exists = c.execute(
+			'''SELECT EXISTS(SELECT 1 FROM record_table where id = ?);''', (id, )).fetchone()[0]
+		if not record_exists: # Create a new record entry if the record does not exist
+			c.execute(
+				'''INSERT into record_table VALUES(?, ?);''',
+				(id, num_bosses_defeated)
+			)
+		else: # Update the existing record if the record exists
+			c.execute(
+				'''UPDATE record_table SET num_bosses_defeated = ? WHERE id = ?''',
+				(num_bosses_defeated, id)
+			)
 
 		conn.commit()  # commit commands
 		conn.close()  # close connection to database
@@ -115,10 +132,21 @@ class Database:
 		c = conn.cursor()  # make cursor into database (allows us to execute commands)
 		# Query for all players
 		players = c.execute('''SELECT * FROM player_table;''').fetchall()
+
+		records = c.execute('''SELECT * FROM record_table;''').fetchall()
+		# Append each player's records to each player
+		records = {id: (num_bosses_defeated,) for id, num_bosses_defeated in records}
+		all_players = []
+		for player in players:
+			id = player[0]
+			# convert num bosses defeated to a tuple this to a tuple
+			num_bosses_defeated = records[id]
+			all_players.append(player + num_bosses_defeated)
+
+
 		conn.commit()  # commit commands
 		conn.close()  # close connection to database
-
-		return players
+		return all_players
 
 	@classmethod
 	def get_all_monsters(cls, database=db_constants.DATABASE_PATH):
@@ -166,10 +194,23 @@ class Database:
 		c = conn.cursor()  # make cursor into database (allows us to execute commands)
 		# Query for player information
 		player_info = c.execute('''SELECT * FROM player_table WHERE id = ?;''',(player_id,)).fetchone()
+		record_info = c.execute('''SELECT * FROM record_table WHERE id = ?''',(player_id,)).fetchone()
+
 		conn.commit()  # commit commands
 		conn.close()  # close connection to database
 
-		return player_info
+		# record_info[1:] represents num_bosses_defeated
+		return player_info + record_info[1:]
+
+	@classmethod
+	def get_record_info(cls, player_id, database=db_constants.DATABASE_PATH):
+		conn = sqlite3.connect(database)  # connect to that database (will create if it doesn't already exist)
+		c = conn.cursor()  # make cursor into database (allows us to execute commands)
+		record_info = c.execute('''SELECT * FROM record_table WHERE id = ?''',(player_id,)).fetchone()
+
+		conn.commit()  # commit commands
+		conn.close()  # close connection to database
+		return record_info
 
 	@classmethod
 	def get_monster_info(cls, monster_id, database=db_constants.DATABASE_PATH):
@@ -231,6 +272,9 @@ class Database:
 		c.execute(
 			'''DROP TABLE IF EXISTS monster_table'''
 		)
+		c.execute(
+			'''DROP TABLE IF EXISTS record_table'''
+		)
 
 		conn.commit()  # commit commands
 		conn.close()  # close connection to database
@@ -280,6 +324,20 @@ class Deserialize:
 				players.append(cls.createPlayerObject(player_info))
 
 			return Game(rows, columns, players, monsters)
+
+	@classmethod
+	def getNumBossesDefeated(cls, player_id, database=db_constants.DATABASE_PATH):
+		"""
+		Returns number of bosses the player has defeated
+		:param player_id: id of the player
+		:param database: database to look in
+		:return: number of bosses the player has defeated
+		"""
+		record_info = Database.get_record_info(player_id, database)
+		if not record_info:
+			return 0
+		else:
+			return record_info[1]
 
 	@classmethod
 	def createGameWithinRange(cls, row, col):
