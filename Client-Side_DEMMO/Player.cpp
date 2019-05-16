@@ -52,7 +52,7 @@ class Player{
     return luck; 
   }
 
-  void setLuck() { 
+  void setLuck(int luck) { 
     this->luck = luck; 
   }
 
@@ -60,7 +60,7 @@ class Player{
     return gold; 
   }
 
-  void setGold() { 
+  void setGold(int gold) { 
     this->gold = gold; 
   }
 
@@ -108,6 +108,23 @@ class Player{
     }
   }
 
+  void setStats(string playerStats){
+    // draw player stats
+    int token_index = playerStats.find(',');
+    health = atoi(playerStats.substr(0, token_index).c_str());
+    playerStats = playerStats.substr(token_index+1);
+    token_index = playerStats.find(',');
+    power = atoi(playerStats.substr(0, token_index).c_str());
+    playerStats = playerStats.substr(token_index+1);
+    token_index = playerStats.find(',');
+    luck = atoi(playerStats.substr(0, token_index).c_str());
+    playerStats = playerStats.substr(token_index+1);
+    token_index = playerStats.find(',');
+    gold = atoi(playerStats.substr(0, token_index).c_str());
+    playerStats = playerStats.substr(token_index+1);
+    token_index = playerStats.find(',');
+    numBossDefeated = atoi(playerStats.substr(0, token_index).c_str());
+  }
   void drawStats(string playerStats){
     // draw player stats
     int token_index = playerStats.find(',');
@@ -145,6 +162,23 @@ class Player{
     }
   }
 
+  void drawShopStats(){
+      for (int i = 0; i < 5; i++) {
+      draw->setCursor(30, i*10);
+      if (i == 0) {
+        draw->println("  Stats   ");
+      } else if (i == 1) {
+        draw->printf("HP:   %d", health);
+      } else if (i == 2) {
+        draw->printf("PWR:  %d", power);
+      } else if (i == 3) {
+        draw->printf("Luck: %d", luck);
+      } else if (i == 4) {
+        draw->printf("Gold: %d", gold);
+      }
+    }
+  }
+  
   void drawFlavorText(int randomIndex){
       // draw player options
       const int SQUARE_SIZE = 15;
