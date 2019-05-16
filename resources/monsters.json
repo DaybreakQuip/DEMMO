@@ -56,16 +56,16 @@
       "id": "Minion5",
       "row": 5,
       "col": 9,
-      "health": 5,
-      "power": 1,
+      "health": 30,
+      "power": 3,
       "is_boss": false,
       "defeated_by": []
     },    {
       "id": "Minion6",
       "row": 7,
       "col": 0,
-      "health": 5,
-      "power": 1,
+      "health": 25,
+      "power": 3,
       "is_boss": false,
       "defeated_by": []
     },
@@ -73,16 +73,16 @@
       "id": "Minion7",
       "row": 9,
       "col": 2,
-      "health": 5,
-      "power": 1,
+      "health": 40,
+      "power": 2,
       "is_boss": false,
       "defeated_by": []
     },    {
       "id": "Minion8",
       "row": 5,
       "col": 4,
-      "health": 5,
-      "power": 1,
+      "health": 15,
+      "power": 7,
       "is_boss": false,
       "defeated_by": []
     },
@@ -90,16 +90,70 @@
       "id": "Minion9",
       "row": 0,
       "col": 9,
-      "health": 5,
-      "power": 1,
+      "health": 10,
+      "power": 10,
       "is_boss": false,
       "defeated_by": []
     },    {
       "id": "Minion10",
       "row": 6,
       "col": 3,
-      "health": 5,
-      "power": 1,
+      "health": 60,
+      "power": 5,
+      "is_boss": false,
+      "defeated_by": []
+    },
+	{
+      "id": "Minion11",
+      "row": 3,
+      "col": 5,
+      "health": 40,
+      "power": 7,
+      "is_boss": false,
+      "defeated_by": []
+    },
+	{
+      "id": "Minion12",
+      "row": 1,
+      "col": 8,
+      "health": 35,
+      "power": 6,
+      "is_boss": false,
+      "defeated_by": []
+    },
+	{
+      "id": "Minion13",
+      "row": 6,
+      "col": 7,
+      "health": 100,
+      "power": 2,
+      "is_boss": false,
+      "defeated_by": []
+    },
+	{
+      "id": "Minion14",
+      "row": 8,
+      "col": 0,
+      "health": 30,
+      "power": 5,
+      "is_boss": false,
+      "defeated_by": []
+    },
+	{
+      "id": "Minion15",
+      "row": 3,
+      "col": 3,
+      "health": 10,
+      "power": 3,
+      "is_boss": false,
+      "defeated_by": []
+    },
+	{
+      "id": "Minion16",
+      "row": 2,
+      "col": 0,
+      "health": 15,
+      "power": 3,
       "is_boss": false,
       "defeated_by": []
     },
@@ -109,6 +163,24 @@
       "col": 1,
       "health": 1000,
       "power": 5,
+      "is_boss": true,
+      "defeated_by": []
+    },
+	{
+      "id": "Werewolf",
+      "row": 4,
+      "col": 0,
+      "health": 2000,
+      "power": 15,
+      "is_boss": true,
+      "defeated_by": []
+    },
+	{
+      "id": "Baby Dragon",
+      "row": 1,
+      "col": 6,
+      "health": 150,
+      "power": 10,
       "is_boss": true,
       "defeated_by": []
     },
