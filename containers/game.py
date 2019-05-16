@@ -153,6 +153,11 @@ class Game:
         :param player_id: the id of the player
         :return: a monster object if a monster exists in the same tile as the player and None otherwise
         """
+
+        # TODO: Multiplayer
+        # If there is a player on the same tile AND there is no monster on the tile
+        #       then return a NEW monster that has the health & power of the player AND 0 gold
+
         player = self.id_to_players[player_id]
         row, col = player.get_location()
         tile = self.map.get_tile(row, col)
