@@ -10,10 +10,11 @@ using std::string;
 #include "Monster.cpp"
 //#include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
-//char network[] = "MIT";
-char network[] = "6s08";  //SSID for 6.08 Lab
+char network[] = "MIT";
+//char network[] = "6s08";  //SSID for 6.08 Lab
 string player = "Max";
-char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
+//char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
+char password[] = "";
 const uint32_t pwm_channel = 0; 
 const uint8_t IUD = 32; //pin connected to button 
 const uint8_t ILR = 33; //pin connected to button
@@ -365,7 +366,14 @@ string action(){
   switch(state){
     case START:
       tft.setCursor(0,0,1);
-      tft.println("Welcome to DEMMO! Press button to continue.");
+      tft.println("...The last thing you recall is falling asleep with a strange game in your hand."); 
+      tft.println("");
+      tft.println("Out of the corner of your eye flashes an eerily familiar bright green sign:"); 
+      tft.println("");
+      tft.println("Welcome to DEMMO!");
+      tft.println("");
+      tft.println("Press button to continue.");
+      
       if (digitalRead(BUTTON_1) == 0 && (millis() - buttonTimer > 500)){
           Serial.println("Button has been pressed, starting the game!");
           tft.fillScreen(TFT_BLACK);
