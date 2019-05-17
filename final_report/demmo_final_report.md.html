@@ -16,6 +16,8 @@ respawning and farmable monsters, a portable shop system to purchase player stat
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/rPcvFmMMvDs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
+(If video is unavailable, go to https://youtu.be/rPcvFmMMvDs)
+
 The game begins on the start screen, which displays the plot of the game. 
 
 ## Shop
@@ -92,7 +94,7 @@ Below the game map is a list of player and monster information, which also inclu
 each player and/or monster that is currently in the game. The number on the left indicates the
 tile number and the information on the right indicates the stats of the player or monster.
 
-![Figure [map_stats]: Example map stats for players and monsters currently in game](./images/map_stats.JPG border="1")
+![Figure [map_stats]: map stats for players and monsters currently in game](./images/map_stats.JPG border="1")
 
 ## Database
 
@@ -106,7 +108,7 @@ Our game information is stored using three tables:
 * `monster_table`: Stores monster information, including: monster ID, power, health, and set of player IDs that defeated it.
 * `record_table`: Stores how many bosses each player has defeated.
 
-By using all three tables, we are able to keep track of a player's progression and each player ID or monster ID is unique 
+By using all three tables, we are able to keep track of a player's progression and each player ID or monster ID is unique
 in the game so that no players have the same ID no monsters have the same ID.
 
 ### Inteacting with the Database
@@ -117,18 +119,13 @@ makes an action. As a result, we decided to simplify interactions with the datab
 interacts with the server directly.
 
 To do so, we first created python classes to represent the Game, Players, and Monsters. Next, we created functions to convert
-from python objects to database entries and vice versa. More specifically, when an action is made by a client: 
+from python objects to database entries and vice versa. More specifically, when an action is made by a client:
 
-1. Game objects are created based on information from the database. 
+1. Game objects are created based on information from the database.
 2. Changes are made directly to the python objects.
 3. Properties of the game objects are saved to the database to preserve the changes.
 
 ![Figure [update_player]: Function to save player object information to the database](./images/update_player.JPG )
-
-
-# Device Side
-
-Example section!
 
 ## Additional Hardware
 
