@@ -377,7 +377,7 @@ class Serialize:
 	def updatePlayer(cls, player, database=db_constants.DATABASE_PATH):
 		"""
 		Updates a single player information in the database
-		:param Player: (Player) player object to  be saved
+		:param Player: (Player) player object to be saved
 		:return: None
 		"""
 		# if the player died, delete the player's entry from the database
