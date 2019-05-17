@@ -3,6 +3,14 @@ Dungeon Exploration MMO
 
 Our goal is to create a multiplayer dungeon exploration game which will feature players armed with their own ESP32s fighting for survival inside a dangerous world filled with deadly monsters, greedy merchants, and backstabbing players. The gameplay will involve a combat system with voice activated magic and motion based physical attacks. Our vision is to include PVP, world events, adrenaline pumping background music, and explosive sound effects. Journey through our perilous maps to rediscover the wonders of old-school dungeon exploration that defined the childhoods of many. 
 
+<object width="425" height="350">
+  <param name="movie" value="https://youtu.be/jgVyfEZDJ9I" />
+  <param name="wmode" value="transparent" />
+  <embed src="https://youtu.be/jgVyfEZDJ9I"
+         type="application/x-shockwave-flash"
+         wmode="transparent" width="425" height="350" />
+</object>
+
  Directory files & What they do
 
      DEMMO/
