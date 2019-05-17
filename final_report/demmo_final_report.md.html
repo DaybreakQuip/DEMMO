@@ -1,35 +1,310 @@
                 <meta charset="utf-8" emacsmode="-*- markdown -*-">
-                            **6.08 Report Starter Document**
+                            **DEMMO**
+                            
+For our 6.08 final final project, we created a multiplayer game called DEMMO, which is a Dungeon Exploration MMO game. 
 
-For our 6.08 final reports, we require each team create a site report (structure up to you), but we'd strongly recommend building a Markdown-centric report since the learning curve is very shallow, allowing everyone on the team to quickly get up to speed and
+# Overview
 
-Instead of using raw HTML which can be annoying to write in, [Markdown](https://en.wikipedia.org/wiki/Markdown) is a really nice alternative since the syntax is extremely lightweight allowing you to focus on content rather than matching tags, etc.  Markdown on its own usually requires some sort of processor, perhaps on the server hosting the files so that it can utimately turn it into HTML, however there have been several attemps at doing this client-side, meaning within the browser.  One approach to this, we recommend is [MarkDeep](http://casual-effects.com/markdeep/) found here.  This allows you to quickly create a decent looking html document in a number of supported styles (including a LaTeXy one.  The person who wrote it wrote up some nice documentation as well, [found here](https://casual-effects.com/markdeep/features.md.html).
+Our goal was to create a multiplayer dungeon exploration game that featured players armed with their own ESP32s fighting for survival inside a 
+dangerous world filled with deadly monsters, riveting narration, and a dynamic shop system. The gameplay involves traversing the game world and defeating 
+monsters to achieve the ultimate goal: defeating all bosses scattered throughout the map. 
 
-This page you're currently reading, in fact, is written/rendered using MarkDeep. (go ahead and right/control-click on this page and see the source!)
+The main features of this game include exciting turn-based combat with beautiful animations, 
+respawning and farmable monsters, a portable shop system to purchase player stat upgrades, and a mini map where you can neighboring players that are online and monsters.
+
+# Gameplay
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/jgVyfEZDJ9I" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+The game begins on the start screen, which displays the plot of the game. 
+
+## Shop
+
+Press the left button to select the BUY option. Then, press the left button again to confirm that you want to enter the shop or the right button to cancel the action.
+
+Entering the shop updates the LCD screen to display the player's current stats and a list of stat upgrades with prices next to them.
+
+The player can move the joystick up or down to scroll through the stat upgrades. 
+Pressing the left button confirms and purchase and pressing the right button exits the shop.
+The bottom of the screen displays a message indicating either a successful or unsuccessful purchase. 
+A purchase is unsuccessful if the player has insufficient gold for the upgrade.
+
+## Log Out
+
+Press the right button to select the QUIT option. Then, press the left button to confirm the logout or the right button to cancel the logout. 
+Logging out will bring the player back to the starting screen. 
+
+## Explore
+
+On the top left corner of the LCD screen is a minimap centered around the player that displays information about the player's vicinity.
+The minimap is a 3x3 square grid that represents the one-square radius around the player (indicated by a green circle). 
+
+The player can move in the following directions using the joystick: up, down, left, and right.
+
+Yellow tiles indicating the border of the map prevent the player from moving outside the bounds of the game, 
+while red and orange tiles representing mobs and bosses respectively launch the player into battle. 
+
+## Fight
+
+When a player enters a battle, the LCD screen will display the fight sequence with the player as a blue rectangle on the left
+and the monster as a red rectangle on the right. The player's and monster's health are centered on the screen, and the player's
+options during the fight are displayed at the bottom of the screen.
+
+During a battle, the player and the enemy take turns fighting (with the player going first). 
+
+### Attack
+
+The player can attack the monster by pressing the left button, which initiates the fight animation. The damage dealt by the player is displayed
+above the player's health. The monster's health updates during this animation. 
+
+If the monster is alive after the player's attack, it will automatically deal damage to the player and end its turn.
+
+If the damage dealt by the player exceeds the monster's health, the monster will die and fade away, ending the battle.
+At the end of a battle, the player exits the fight sequence and returns to the original display with 
+a minimap, stats window, options window, and narration.
+
+### Forfeit
+
+The player can also forfeit the battle (and therefore the player's life) by pressing the right button, which causes the player to fade away.
+This leads to the defeat screen, followed by the start screen. Forfeiting causes the player's stats to be wiped, so the player will have to start from scratch.
+
+# Server Side
+
+The server for DEMMO consists of two parts: the website and the database.
+
+## Website
+
+On our game website, we display information about the entire game map in addition to details about player
+and monster information. The purpose of the website is to serve as tool for gamemasters to have
+a complete view of the game at all times and be able to see the whereabouts and statistics of all the
+players currently in game.
+
+### Game Map
+
+![Figure [game_map]: Rendering of a map on our server](./images/game_map.JPG width="400px" border="1")
+
+For our website's game map, we chose to render the layout of the map by assigning a number to
+each tile that increases from left to right and top to bottom. 
+
+### Player and Monsters Information
+
+Below the game map is a list of player and monster information, which also includes the location of
+each player and/or monster that is currently in the game. The number on the left indicates the
+tile number and the information on the right indicates the stats of the player or monster.
+
+![Figure [map_stats]: Example map stats for players and monsters currently in game](./images/map_stats.JPG border="1")
+
+## Database
+
+In order to make our game data persistent and available to multiple clients at the same time, we chose to
+use a database to store our map, player, and monster information.
+
+### Game Information
+
+Our game information is stored using three tables:
+* `player_table`: Stores player information, including: player ID, power, health, gold, and location.
+* `monster_table`: Stores monster information, including: monster ID, power, health, and set of player IDs that defeated it.
+* `record_table`: Stores how many bosses each player has defeated.
+
+By using all three tables, we are able to keep track of a player's progression and each player ID or monster ID is unique 
+in the game so that no players have the same ID no monsters have the same ID.
+
+### Inteacting with the Database
+
+Internally, the database contains persisting information about players and monsters; however, interacting with
+the database can be difficult and complex, especially because we needed to update the game whenever a player
+makes an action. As a result, we decided to simplify interactions with the database by abstracting the code that
+interacts with the server directly.
+
+To do so, we first created python classes to represent the Game, Players, and Monsters. Next, we created functions to convert
+from python objects to database entries and vice versa. More specifically, when an action is made by a client: 
+
+1. Game objects are created based on information from the database. 
+2. Changes are made directly to the python objects.
+3. Properties of the game objects are saved to the database to preserve the changes.
+
+![Figure [update_player]: Function to save player object information to the database](./images/update_player.JPG )
 
 
-Section
-===============================================================================
+# Device Side
 
 Example section!
 
-Subsection
--------------------------------------------------------------------------------
+## Additional Hardware
+
+The only additional hardware we used in the project is a joystick.
+![Figure [joystick]: Two-Axis joystick that adds analog input to the project](./images/joystick.JPG )
+
+## System Design
+
+![Figure [system_block_diagram]: System block diagram for the server and client](./images/system_block_diagram.png)
+
+![Figure [client_state_diagram]: State diagram for our client on our ESP32 arduino client](./images/client_state_diagram.png)
+
+## Class Designs and Descriptions
+
+There are three main classes that handle the entire game's logic: Player, Monster, and Fight.
+
+### Player
+The player has 5 main attributes: health, power, luck, gold and numBosseDefeated. Some of them are used mainly for displaying,
+and others have a purpose during the battle. Player also receives a tft draw object to be able to draw on the LCD.
+The player is a mutable class, and there only ever is one player in the main client. It has the functions to setHealth and
+getPower used for the battle feature. It also has the getNumBossDefeated() and getGold() as well, for drawing stats inside
+the move screen and the shop. It also has two additional methods for stats, setStats() and drawStats(), which both does similar
+functions, but one is mostly used for drawing purposes and the other one is used for calculation purposes. There is a drawMap()
+which basically draws the miniMap. There is also the drawShopStats() which displays the stats in the shop screen. The final function
+is called drawFlavorText() which uses a private string array to generate narrative for the game while moving around the map.
+
+### Monster
+
+The monster has two main attributes, health and power, with setHealth() and getHealth() to use in battle. Players will interact with this
+monster object during the fight.
+
+### Fight
+
+The class fight is where the main battle takes place. It takes in a monster and a player, as well as a tft draw for the animation.
+There is an internal fight state indicating which state the fight is on. When a battle begins, the fight will transition from IDLE to
+PLAYER_TURN and then MONSTER_TURN and alternate between the two until either the player or monster's hp drops to 0. 
+This is encompassed in a while loop inside a function (startFight()), which the FIGHT state in the main code calls. When one side loses, 
+the fight state will move to FIGHT_END, which exits the for loop. Then the fight state transitions into IDLE again. During either PLAYER_TURN
+or MONSTER_TURN, a call will be made to drawPlayerAttack() or drawMonsterAttack() depending on who is attacking. After one side's HP drops
+down to 0, drawMonsterDeath() or drawPlayerDeath() wil be called to display the death animation. The player's attack is calculated based on
+their power and luck. If the player's luck is greater than a random number, the player has the chance to deal 1.5x his regular power attack,
+in which the power attack will range from 80% to 120% of the player's power. The monster attacks with 80% to 120% of its power.
+Button A is used to attack and button B is used to forfeit.
+
+## Client Design
+
+The client side's main design comes from its use of state machines supported by a function, alongside the main loop.
+
+### Main Loop
+The main loop handles two particular states before handing it off to another function to deal with the rest
+the game play. It handles buttons A and B during the move state, which will be explained in a further subsection.
+It calls the action() function, which can return an empty string, in which nothing needs to be done, or an nonempty string,
+in which the screen has to be redrawn.
+
+### START State
+The start state shows the starting screen with the game narrative. To transition from this state to the next state
+which is the move state, the player has to press button A. What this will do is send a POST request to the server
+to either grab a player's data if the player already exists, or create a player, if they didn't exist.
+
+### MOVE state
+The move state is where the main exploration comes in. This state utilizes the joystick to move the player around.
+What is displayed in this state is the player minimap, which updates with each player movement, including running into
+the wall. It also displays the player's stats and also narrative text. You can go up, down, left, and right with the
+joystick. To transition from MOVE state to BUY state for the shop, we have to press button A twice. Pressing it once and
+pressing button B will cancel your selection. This is the same way you exit the game, except you have to press button B first
+and then button A to confirm or button B to cancel. If you run into a monster, you'll transition to the fight state.
+This state also displays two options: BUY and QUIT visually.
+
+### FIGHT state
+The fight state simulates a fight between the player and the monster that the player ran into, which is further detailed above.
+When a fight ends, a POST request is sent with the player's health, and based on the player's health, 0 or nonzero, the player
+is either sent into the END screen for defeat or MOVE screen for continuing the game.
+
+### END state
+This screen tells you that you lost the game and transitions you back to the START state, but your character is defeated, and so
+will be reset on the database.
+
+### CHOOSE_BUY state
+You can access this state from the MOVE state.
+This state is where you confirm where you want to buy or not, and will highlight the buy option on your screen. If you confirm by
+pressing A, you will enter buy state. Otherwise, you'll go back to the move state.
+
+### BUY state
+This state is where you get to buy 5 health, 1 power, or 1 luck. It will highlight the options you're currently
+trying to buy. Use the joystick to change options, and press A to buy. Pressing B will take you back to the MOVE state.
+
+### CHOOSE_QUIT state
+You can access this state from the MOVE state.
+This state is where you confirm where you want to quit or not, and will highlight the quit option on your screen. If you confirm by
+pressing A, you will enter quit state. Otherwise, you'll go back to the move state.
+
+### QUIT state
+The quit state clears your map and takes you back to the START state, but leaves your character intact.
+
+### OFF state
+The off state is a special state, because every state can transition to the off state after passing a certain amount of time without valid
+input. THe OFF state will not let you take any actions except press A to wake up the screen. Waking up the screen
+will take you back to the previous state you were in before you triggered OFF state.
+
+### action function
+The action function is what handles all these states and behaviors and will return an empty string if no post request needs to be sent,
+or a POST request response if the server needs to be updated and then the screen is redrawn based on the server response.
+## Parsing Responses from the Server
 
 Example subsection
 
-For images, and other static media, try to place them all in a reasonable directory structure like we do below
+## Power Considerations
 
-![Figure [granada]: Example image...a 75-77 (didn't want to get too close to check) Ford Granada Coupe I spotted in my neighborhood two weekends ago! Look at that thing.](./images/granada.png width="400px" border="1")
+### PWM System
+In order to make our game playable for a long time without being plugged into a laptop, we added a PWM system (Pulse Width Modulation) that turns off our 
+LCD screen when the player has not touched the joystick or the button for 5 seconds. This is made possible by having an universal OFF state, which every other state
+can enter the OFF state, even within a fight.Only a the click of a particular button can wake the system up, but thatbutton press does not have any effect on the game itself 
+besides turning the LCD on, as it only transitions from the OFF state to whatever the state the player was in before the screen turned off. If any valid move is made, then 
+the timer for turning off the PWM resets. Valid moves include using the joystick while in the move state. If, for example, the player moves the joystick during a fight state,
+it is considered an invalid move and will not reset the timer.
 
-For small videos, you can upload/include them with your static files like images.  For larger videos, strongly consider hosting on a resource like Youtube!
+### Other Power Saving
+In order to save more power, all the fights occur locally on our ESP32s and only the fight results get sent to the server. This also applies for the shop system, in which
+the cost of an item is calculated locally, and a POST request is only sent if the player has enough gold.
 
-Markdeep features some really nice ASCII-based block-diagrams if you want to use them (and are patient enough)
+# Client Communication with Server
+
+The client communicates with the server to get player information and to send player information to update the server.
+
+## ESP to Website Communication
+
+The ESP communicates with the website through a POST request based on a particular action that the player takes. The POST request
+will send back details of the player, their neighbors, and whether or not the palyer is on the same tile as a monster, and if so,
+the monster's stats.
+
+### Posting a POST Request
+
+There is a POST request function that handles different types of inputs from the ESP. The actions/commands include,
+"up", "down", "left", "right" for movement. For sending the results of a fight the command is
+"fight_result&health=number". For the shop, the inputs are "buy&stat=health", "buy&stat=power", and "buy&stat=luck". Internally,
+the POST request adds on the player ID, along with the host's website and the header type (x-form) so that the request could
+be processed by the server. Then a string of the information as described above is returned to be used by the main client.
+
+## Website to Database Communication
+
+Once a request is sent to the website, a request handler on the website handles GET and POST requests separately.
+
+### Handling Requests
+
+For GET requests, the request handler will return about the game map if the request has: `?option=map`
+
+For POST requests, the request handler will process a player action and update the game's database to make the result of 
+actions persistent if an action is valid.
+
+## Conclusions
+
+This project has taught our team a lot about how to program with different parts of the embedded system,
+as well as how to communicate with each other and how to work well togther. We implemented a good and working game
+system in which players could explore and fight, which works very well. What we could do better as a team is to improve
+our code. Although our code is fully functional, some of our code could be simplified to make it look cleaner. What we hope to
+do in the future with this project is to implement a sound system that can play sound effect of battles and music. We also want to 
+implement a system where players can interact with each other, as in battling each other instead of just being able to see other 
+players on a minimap. We also want to add physical movements with the device and voice activated attacks for future iterations.
+All in all, this was a fun project to do, and we accomplished a lot.
+
+# Meet the Team
+Yanni Wang
+
+|   |   |
+|---|---|
+|Yanni Wang|![](./images/yanni_wang.JPG width="100px" border="1")|
+|   |   |
+|---|---|
+|   |   |
 
 
-Questions?
----------------------
-Questions?  Read the docs for markdeep (the feature demo in particular). They are nice, but for 6.08-specific formatting rules, please feel free to post on Piazza!
+Ze Hang Zheng
 
+# Github Link
+https://github.com/jyang8/DEMMO
+
+------------------------------------------------------------------------------------------------
 
 <!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js" charset="utf-8"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js?" charset="utf-8"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
