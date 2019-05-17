@@ -11,11 +11,11 @@ using std::string;
 #include "Monster.cpp"
 //#include "Fight.cpp"
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
-char network[] = "MIT";
-//char network[] = "6s08";  //SSID for 6.08 Lab
-string player = "Max";
-//char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
-char password[] = "";
+//char network[] = "MIT";
+char network[] = "6s08";  //SSID for 6.08 Lab
+string player = "Ze";
+char password[] = "iesc6s08"; //Password for 6.08 Labconst uint8_t IUD = 32; //pin connected to button
+//char password[] = "";
 const uint32_t pwm_channel = 0; 
 const uint8_t IUD = 32; //pin connected to button 
 const uint8_t ILR = 33; //pin connected to button
@@ -285,7 +285,7 @@ void setup() {
     Serial.println("Restarting");
     ESP.restart(); // restart the ESP (proper way)
   }
-  WiFi.begin(network);
+  WiFi.begin(network, password);
   uint8_t count = 0; //count used for Wifi check times
   Serial.print("Attempting to connect to ");
   Serial.println(network);
