@@ -8,7 +8,7 @@ monsters to achieve the ultimate goal: defeating all bosses scattered throughout
 The main features of this game include exciting turn-based combat with beautiful animations,
 respawning and farmable monsters, a portable shop system to purchase player stat upgrades, and a mini map where you can neighboring players that are online and monsters.
 
-[Gameplay Video](https://youtu.be/jgVyfEZDJ9I)
+[Gameplay Video](https://youtu.be/rPcvFmMMvDs)
 
  Directory files & What they do
 
