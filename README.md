@@ -1,15 +1,14 @@
 # 6.08 Final Project: DEMMO
 Dungeon Exploration MMO
 
-Our goal is to create a multiplayer dungeon exploration game which will feature players armed with their own ESP32s fighting for survival inside a dangerous world filled with deadly monsters, greedy merchants, and backstabbing players. The gameplay will involve a combat system with voice activated magic and motion based physical attacks. Our vision is to include PVP, world events, adrenaline pumping background music, and explosive sound effects. Journey through our perilous maps to rediscover the wonders of old-school dungeon exploration that defined the childhoods of many. 
+Our goal was to create a multiplayer dungeon exploration game that featured players armed with their own ESP32s fighting for survival inside a
+dangerous world filled with deadly monsters, riveting narration, and a dynamic shop system. The gameplay involves traversing the game world and defeating
+monsters to achieve the ultimate goal: defeating all bosses scattered throughout the map.
 
-<object width="425" height="350">
-  <param name="movie" value="https://youtu.be/jgVyfEZDJ9I" />
-  <param name="wmode" value="transparent" />
-  <embed src="https://youtu.be/jgVyfEZDJ9I"
-         type="application/x-shockwave-flash"
-         wmode="transparent" width="425" height="350" />
-</object>
+The main features of this game include exciting turn-based combat with beautiful animations,
+respawning and farmable monsters, a portable shop system to purchase player stat upgrades, and a mini map where you can neighboring players that are online and monsters.
+
+[Gameplay Video](https://youtu.be/jgVyfEZDJ9I)
 
  Directory files & What they do
 
